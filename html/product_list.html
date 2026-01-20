@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>价格列表展示</title>
+    <!-- 引入Tailwind CSS简化样式开发 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .price-tag {
+                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- 页面头部 -->
+    <header class="bg-white shadow-sm py-4 px-6">
+        <div class="container mx-auto">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-800">
+                <i class="fa-solid fa-tags text-primary mr-2"></i>价格列表
+            </h1>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto py-8 px-6">
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-10">
+            <i class="fa-solid fa-circle-notch fa-spin text-primary text-2xl"></i>
+            <p class="mt-2 text-gray-600">正在加载数据...</p>
+        </div>
+
+        <!-- 数据展示区域 -->
+        <div id="data-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+            <!-- 数据卡片会通过JS动态生成 -->
+        </div>
+
+        <!-- 空数据状态 -->
+        <div id="empty-state" class="text-center py-10 hidden">
+            <i class="fa-solid fa-file-invoice-dollar text-gray-300 text-4xl"></i>
+            <p class="mt-2 text-gray-500">暂无价格数据</p>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="error-state" class="text-center py-10 hidden">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
+            <p class="mt-2 text-red-500">加载数据失败，请稍后重试</p>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-100 py-4 px-6 mt-auto">
+        <div class="container mx-auto text-center text-gray-500 text-sm">
+            <p>价格数据展示 &copy; 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // 模拟接口请求获取JSON数据
+        async function fetchData() {
+            try {
+                // 改为 Go 后端的接口地址
+                const apiUrl = 'http://127.0.0.1:8080/product/list';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status} ${response.statusText}`);
+                }
+
+                const responseData = await response.json();
+                return responseData;
+            } catch (error) {
+                console.error('获取数据失败:', error);
+                throw error;
+            }
+        }
+
+        // 渲染数据到页面 + 绑定点击事件
+        function renderData(data) {
+            const container = document.getElementById('data-container');
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('empty-state');
+            const errorState = document.getElementById('error-state');
+
+            // 隐藏加载状态
+            loading.classList.add('hidden');
+
+            if (data && data.length > 0) {
+                // 显示数据容器
+                container.classList.remove('hidden');
+                
+                // 清空容器
+                container.innerHTML = '';
+
+                // 遍历数据创建卡片
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    // 关键1：添加 product-item class + data-sku 属性（传递sku参数）
+                    card.className = 'product-item bg-white rounded-lg p-6 card-shadow hover:shadow-lg transition-shadow duration-300 cursor-pointer';
+                    card.dataset.sku = item.sku || item.name; // 优先用sku，无则用name（根据后端返回字段调整）
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">${item.name}</h2>
+                            <span class="price-tag text-primary font-bold px-3 py-1 rounded-full">
+                                $${item.price}
+                            </span>
+                        </div>
+                        <div class="border-t border-gray-100 pt-4">
+                            <p class="text-sm text-gray-500">
+                                <i class="fa-solid fa-clock text-secondary mr-1"></i>
+                                价格更新时间: ${new Date().toLocaleString()}
+                            </p>
+                        </div>
+                    `;
+                    
+                    // 关键2：给每个卡片绑定点击事件（动态生成元素需直接绑定）
+                    card.addEventListener('click', () => {
+                        const productSku = card.dataset.sku;
+                        console.log('点击的商品SKU：', productSku); // 调试用
+                        // 跳转至详情页（确认详情页文件名：product_detail.html 或 product-detail.html）
+                        window.location.href = `product_detail.html?sku=${encodeURIComponent(productSku)}`;
+                    });
+
+                    container.appendChild(card);
+                });
+            } else {
+                // 显示空数据状态
+                emptyState.classList.remove('hidden');
+            }
+        }
+
+        // 处理错误
+        function handleError() {
+            const loading = document.getElementById('loading');
+            const errorState = document.getElementById('error-state');
+            
+            loading.classList.add('hidden');
+            errorState.classList.remove('hidden');
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const result = await fetchData();
+                if (result.code === 200) {
+                    renderData(result.data);
+                } else {
+                    handleError();
+                }
+            } catch (error) {
+                handleError();
+            }
+        });
+    </script>
+</body>
+</html>

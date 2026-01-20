@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情 | 价格列表展示</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .price-tag {
+                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            }
+        }
+    </style>
+
+    <!-- JSON-LD 会通过JS动态插入到这里 -->
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- 页面头部 -->
+    <header class="bg-white shadow-sm py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-800">
+                <i class="fa-solid fa-tags text-primary mr-2"></i>商品详情
+            </h1>
+            <a href="index.html" class="text-primary hover:text-primary/80 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-1"></i>返回列表
+            </a>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto py-8 px-6">
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-10">
+            <i class="fa-solid fa-circle-notch fa-spin text-primary text-2xl"></i>
+            <p class="mt-2 text-gray-600">正在加载商品详情...</p>
+        </div>
+
+        <!-- 商品详情卡片 -->
+        <div id="product-detail" class="bg-white rounded-lg p-8 card-shadow hidden">
+            <div class="flex flex-col md:flex-row md:items-start gap-6">
+                <!-- 商品基本信息 -->
+                <div class="flex-1">
+                    <h2 id="product-name" class="text-2xl font-bold text-gray-800 mb-4"></h2>
+                    <div class="price-tag inline-block text-primary font-bold text-xl px-4 py-2 rounded-full mb-6">
+                        $<span id="product-price"></span>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 mb-4">
+                        <p class="text-gray-700">
+                            <i class="fa-solid fa-file-alt text-secondary mr-2"></i>
+                            <span class="font-medium">描述：</span>
+                            <span id="product-description"></span>
+                        </p>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4">
+                        <p class="text-gray-700">
+                            <i class="fa-solid fa-barcode text-secondary mr-2"></i>
+                            <span class="font-medium">SKU：</span>
+                            <span id="product-sku"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空数据/错误状态 -->
+        <div id="empty-state" class="text-center py-10 hidden">
+            <i class="fa-solid fa-box-open text-gray-300 text-4xl"></i>
+            <p class="mt-2 text-gray-500">未找到该商品</p>
+        </div>
+        <div id="error-state" class="text-center py-10 hidden">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
+            <p class="mt-2 text-red-500">加载商品详情失败，请稍后重试</p>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-100 py-4 px-6 mt-auto">
+        <div class="container mx-auto text-center text-gray-500 text-sm">
+            <p>价格数据展示 &copy; 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. 从URL获取sku参数
+        function getQueryParam(key) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(key);
+        }
+        const productSku = getQueryParam('sku');
+
+        // 2. 动态插入JSON-LD到head标签
+        function insertJsonLd(productLd) {
+            // 创建script标签
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            // 将product_ld对象转为JSON字符串（注意转义）
+            script.textContent = JSON.stringify(productLd);
+            // 插入到head标签末尾
+            document.head.appendChild(script);
+        }
+
+        // 3. 请求后端获取商品详情
+        async function fetchProductDetail() {
+            try {
+                if (!productSku) {
+                    throw new Error('SKU参数为空');
+                }
+
+                const apiUrl = `http://127.0.0.1:8080/product/detail?sku=${encodeURIComponent(productSku)}`;
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status}`);
+                }
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('获取商品详情失败:', error);
+                throw error;
+            }
+        }
+
+        // 4. 渲染商品详情
+        function renderProductDetail(data) {
+            const loading = document.getElementById('loading');
+            const detailContainer = document.getElementById('product-detail');
+            const emptyState = document.getElementById('empty-state');
+            const errorState = document.getElementById('error-state');
+
+            loading.classList.add('hidden');
+
+            if (data && data.sku) {
+                // 渲染商品基本信息
+                document.getElementById('product-name').textContent = data.name || '未知商品';
+                document.getElementById('product-price').textContent = data.price || '0.00';
+                document.getElementById('product-description').textContent = data.description || '暂无描述';
+                document.getElementById('product-sku').textContent = data.sku || '无';
+
+                // 核心：插入JSON-LD到head标签
+                if (data.product_ld) {
+                    insertJsonLd(data.product_ld);
+                    console.log('JSON-LD已插入head标签:', data.product_ld);
+                }
+
+                // 显示详情卡片
+                detailContainer.classList.remove('hidden');
+            } else {
+                emptyState.classList.remove('hidden');
+            }
+        }
+
+        // 5. 处理错误
+        function handleError() {
+            const loading = document.getElementById('loading');
+            const errorState = document.getElementById('error-state');
+            
+            loading.classList.add('hidden');
+            errorState.classList.remove('hidden');
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const result = await fetchProductDetail();
+                if (result.code === 200 && result.data) {
+                    renderProductDetail(result.data);
+                } else {
+                    handleError();
+                }
+            } catch (error) {
+                handleError();
+            }
+        });
+    </script>
+</body>
+</html>
