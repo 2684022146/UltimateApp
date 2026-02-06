@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"demo01/response"
-	"demo01/service"
 	"net/http"
 	"strings"
+	"webdemo/response"
+	"webdemo/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,9 +1,0 @@
-Mysql:
-  Host: "82.156.184.166"
-  Port: 3306
-  DbName: "saas_auth"
-  UserName: "saas_dev"
-  PassWord: "t3zary?YMd)d"
-  Charset: "utf8mb4"
-Env:
-  Loc: "Asia/shanghai"

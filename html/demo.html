@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&#x4e00;&#x3001;&#x6838;&#x5fc3;&#x8bf4;&#x660e;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="一核心说明">一、核心说明</h2>
+<p>后端仅返回JSON原始数据，前端负责页面渲染</p>
+<h2 id="二geo优化整体规划">二、GEO优化整体规划</h2>
+<h3 id="21-优化核心目标">2.1 优化核心目标</h3>
+<ol>
+<li>零售端：提升用户搜索时的页面匹配度与排名，强化区域服务覆盖优势。</li>
+<li>工程端：触达装修公司、地产商，凸显区域供货与安装能力。</li>
+<li>全站：通过规范地理信息呈现，强化定位认知，积累地理相关搜索权重，扩大客群覆盖。</li>
+<li>体验&amp;权威度：FAQ、权威资质标注，提升用户信任度与搜索引擎对网站专业度、权威性的识别。</li>
+</ol>
+<h3 id="22-核心优化方向">2.2 核心优化方向</h3>
+<ol>
+<li>服务区域优化：明确标注服务覆盖范围，在各产品页关联对应服务区域。</li>
+<li>本地服务优化：清晰呈现区域内上门测量、安装、售后等服务时效，强化“本地服务”属性，区别于跨区域电商。</li>
+<li>工程对接优化：针对工程类客户，标注工程案例、本地对接团队及服务范围，适配批量采购与定制需求。</li>
+<li>页面地理信息可视化：在首页、联系页、产品分类页展示服务覆盖地图、本地案例，提升用户信任度与搜索引擎识别度。</li>
+<li>权威信息强化：FAQ结构化数据解答用户高频地理/服务问题，企业权威资质、行业认证标注，提升网站权威性。</li>
+</ol>
+<h3 id="23-前后端分工边界">2.3 前后端分工边界</h3>
+<ul>
+<li>后端：提供地理相关原始数据，包括但不限于核心运营地址、服务覆盖清单、区域服务时效、本地对接联系方式、工程案例所在区域等，确保数据精准、格式统一；提供FAQ问答库、企业权威资质（认证名称、颁发机构、有效期）等原始数据。</li>
+<li>前端：对接后端数据，在指定页面展示地理信息；按规范构建JSON-LD结构化数据（含原有地理字段+FAQ、权威信息字段），渲染至页面头部（<code>&lt;head&gt;</code>标签内），确保搜索引擎可抓取；优化页面地理信息呈现形式，提升用户体验。</li>
+</ul>
+<h2 id="三json-ld-结构化数据实施规范">三、JSON-LD 结构化数据实施规范</h2>
+<p>JSON-LD是搜索引擎识别网站地理属性、权威属性的核心载体，需结合零售、批发不同场景，选择对应数据类型，填充完整字段，确保与页面内容一致。前端需将JSON-LD以<code>&lt;script&gt;</code>标签形式渲染至页面头部（<code>&lt;head&gt;</code>标签内），标签类型固定为“application/ld+json”，禁止放入异步加载文件，避免抓取失败。标签核心格式如下：</p>
+<p><strong>基础标签格式</strong>：<code>&lt;script type=&quot;application/ld+json&quot;&gt;{JSON-LD数据内容}&lt;/script&gt;</code>，其中JSON-LD数据需严格遵循JSON格式规范，字段值与页面内容、后端数据完全对齐。</p>
+<h3 id="31-核心适用json-ld类型及场景">3.1 核心适用JSON-LD类型及场景</h3>
+<h4 id="311-商品地理属性标注核心场景">3.1.1 商品地理属性标注（核心场景）</h4>
+<p>适用页面：橱柜分类页、地板页、声学板页、五金配件页等所有产品页面，核心类型为“Product”“CollectionPage”，嵌套地理相关字段、FAQ字段、权威信息字段，标注服务覆盖区域、本地服务属性、用户高频问题、企业权威资质，强化商品与地理区域的关联及网站权威性。</p>
+<p><strong>首页Organization+WebSite+FAQ+权威信息组合Schema</strong>：</p>
+<pre><code class="language-html">
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>,
+    <span class="hljs-string">&quot;@graph&quot;</span>: [
+        {
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Organization&quot;</span>,<span class="hljs-comment">//企业信息核心节点</span>
+            <span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#organization&quot;</span>,<span class="hljs-comment">//全网唯一标识</span>
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry&quot;</span>,<span class="hljs-comment">//企业官方名称</span>
+            <span class="hljs-string">&quot;url&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/&quot;</span>,<span class="hljs-comment">//企业官网地址</span>
+            <span class="hljs-string">&quot;telephone&quot;</span>: <span class="hljs-string">&quot;+1-402-932-3932&quot;</span>,<span class="hljs-comment">//企业联系电话</span>
+            <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry provides premium custom cabinetry for homes and projects across the Midwest, offering high-quality cabinets, flooring, hardware, and more to elevate any space.&quot;</span>,<span class="hljs-comment">//企业核心描述</span>
+            <span class="hljs-string">&quot;address&quot;</span>: {<span class="hljs-comment">//企业物理地址</span>
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;PostalAddress&quot;</span>,<span class="hljs-comment">//邮政地址类型</span>
+                <span class="hljs-string">&quot;streetAddress&quot;</span>: <span class="hljs-string">&quot;10025 I St&quot;</span>,
+                <span class="hljs-string">&quot;addressLocality&quot;</span>: <span class="hljs-string">&quot;Omaha&quot;</span>,
+                <span class="hljs-string">&quot;addressRegion&quot;</span>: <span class="hljs-string">&quot;NE&quot;</span>,
+                <span class="hljs-string">&quot;postalCode&quot;</span>: <span class="hljs-string">&quot;68127&quot;</span>,
+                <span class="hljs-string">&quot;addressCountry&quot;</span>: <span class="hljs-string">&quot;US&quot;</span>
+            },
+            <span class="hljs-string">&quot;areaServed&quot;</span>: [<span class="hljs-comment">//企业服务覆盖区域</span>
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Colorado&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Iowa&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Kansas&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Missouri&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Nebraska&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;North Dakota&quot;</span>},
+                {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;South Dakota&quot;</span>}
+            ],
+            <span class="hljs-string">&quot;openingHoursSpecification&quot;</span>: [  <span class="hljs-comment">//营业时间</span>
+                {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OpeningHoursSpecification&quot;</span>,
+                    <span class="hljs-string">&quot;dayOfWeek&quot;</span>: [<span class="hljs-string">&quot;Monday&quot;</span>,<span class="hljs-string">&quot;Tuesday&quot;</span>,<span class="hljs-string">&quot;Wednesday&quot;</span>,<span class="hljs-string">&quot;Thursday&quot;</span>,<span class="hljs-string">&quot;Friday&quot;</span>],
+                    <span class="hljs-string">&quot;opens&quot;</span>: <span class="hljs-string">&quot;09:00&quot;</span>,
+                    <span class="hljs-string">&quot;closes&quot;</span>: <span class="hljs-string">&quot;17:30&quot;</span>
+                },
+                {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OpeningHoursSpecification&quot;</span>,
+                    <span class="hljs-string">&quot;dayOfWeek&quot;</span>: [<span class="hljs-string">&quot;Saturday&quot;</span>,<span class="hljs-string">&quot;Sunday&quot;</span>],
+                    <span class="hljs-string">&quot;opens&quot;</span>: <span class="hljs-string">&quot;00:00&quot;</span>,
+                    <span class="hljs-string">&quot;closes&quot;</span>: <span class="hljs-string">&quot;00:00&quot;</span>
+                }
+            ],
+            <span class="hljs-string">&quot;sameAs&quot;</span>: [<span class="hljs-string">&quot;https://www.instagram.com/everlastingcabinetryllc&quot;</span>],<span class="hljs-comment">//企业的社交媒体账号</span>
+            <span class="hljs-string">&quot;hasCredential&quot;</span>: [<span class="hljs-comment">//：企业权威资质/认证（提升网站权威性）</span>
+                {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OrganizationRole&quot;</span>,<span class="hljs-comment">//资质关联类型</span>
+                    <span class="hljs-string">&quot;credential&quot;</span>: {
+                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Certificate&quot;</span>,<span class="hljs-comment">//认证类型：证书</span>
+                        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;National Kitchen &amp; Bath Association (NKBA) Certification&quot;</span>,<span class="hljs-comment">//认证名称：全美厨卫协会认证</span>
+                        <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;National Kitchen &amp; Bath Association&quot;</span>,<span class="hljs-comment">//颁发机构</span>
+                        <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2020-01-15&quot;</span>,<span class="hljs-comment">//认证生效时间</span>
+                        <span class="hljs-string">&quot;validUntil&quot;</span>: <span class="hljs-string">&quot;2025-01-14&quot;</span><span class="hljs-comment">//认证失效时间</span>
+                    },
+                    <span class="hljs-string">&quot;roleName&quot;</span>: <span class="hljs-string">&quot;Certified Cabinetry Provider&quot;</span><span class="hljs-comment">//资质对应的企业角色</span>
+                },
+                {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OrganizationRole&quot;</span>,
+                    <span class="hljs-string">&quot;credential&quot;</span>: {
+                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Award&quot;</span>,<span class="hljs-comment">//认证类型：行业奖项</span>
+                        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Midwest Best Custom Cabinetry Provider 2023&quot;</span>,<span class="hljs-comment">//奖项名称：2023中西部最佳定制橱柜供应商</span>
+                        <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;Midwest Home &amp; Construction Magazine&quot;</span>,<span class="hljs-comment">//颁发机构</span>
+                        <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2023-03-01&quot;</span><span class="hljs-comment">//奖项生效时间（无失效期则仅填validFrom）</span>
+                    },
+                    <span class="hljs-string">&quot;roleName&quot;</span>: <span class="hljs-string">&quot;Award-Winning Cabinetry Brand&quot;</span>
+                }
+            ]
+        },
+        {
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;WebSite&quot;</span>,<span class="hljs-comment">//官网的基础属性</span>
+            <span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#website&quot;</span>,<span class="hljs-comment">//网站的唯一标识符</span>
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry&quot;</span>,
+            <span class="hljs-string">&quot;url&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/&quot;</span>,
+            <span class="hljs-string">&quot;publisher&quot;</span>: {<span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#organization&quot;</span>},<span class="hljs-comment">//网站的发布者（关联上方的 Organization 对象）</span>
+            <span class="hljs-string">&quot;inLanguage&quot;</span>: <span class="hljs-string">&quot;en-US&quot;</span>,<span class="hljs-comment">//网站的主要语言</span>
+            <span class="hljs-string">&quot;potentialAction&quot;</span>: {<span class="hljs-comment">//声明网站有「搜索功能」</span>
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;SearchAction&quot;</span>,
+                <span class="hljs-string">&quot;target&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/?s={search_term_string}&quot;</span>,
+                <span class="hljs-string">&quot;query-input&quot;</span>: <span class="hljs-string">&quot;required name=search_term_string&quot;</span>
+            }
+        },
+        {
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;HomePage&quot;</span>,<span class="hljs-comment">//首页</span>
+            <span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#homepage&quot;</span>,<span class="hljs-comment">//首页的唯一标识符</span>
+            <span class="hljs-string">&quot;url&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/&quot;</span>,
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry – Premium Custom Cabinetry Across the Midwest&quot;</span>,<span class="hljs-comment">//对应title标签</span>
+            <span class="hljs-string">&quot;isPartOf&quot;</span>: {<span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#website&quot;</span>},<span class="hljs-comment">//该页面所属的网站</span>
+            <span class="hljs-string">&quot;about&quot;</span>: {<span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#organization&quot;</span>},<span class="hljs-comment">//该页面的核心主题</span>
+            <span class="hljs-string">&quot;inLanguage&quot;</span>: <span class="hljs-string">&quot;en-US&quot;</span>,
+            <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry provides premium custom cabinetry for homes and projects across the Midwest. Explore high-quality cabinets, flooring, hardware, and more to elevate any space.&quot;</span>,<span class="hljs-comment">//页面的描述</span>
+            <span class="hljs-string">&quot;mainEntity&quot;</span>: {<span class="hljs-comment">//：首页核心FAQ模块（解答用户高频地理/服务问题）</span>
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,<span class="hljs-comment">//类型：FAQ页面</span>
+                <span class="hljs-string">&quot;mainEntity&quot;</span>: [<span class="hljs-comment">//FAQ列表，支持多个问答对</span>
+                    {
+                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,<span class="hljs-comment">//问答对-问题</span>
+                        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;What states do you offer cabinet delivery and installation services?&quot;</span>,<span class="hljs-comment">//问题内容（用户高频问的地理服务范围问题）</span>
+                        <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,<span class="hljs-comment">//问答对-答案</span>
+                            <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;We provide delivery and installation services across 7 Midwest states: Colorado, Iowa, Kansas, Missouri, Nebraska, North Dakota, and South Dakota. Nebraska customers enjoy faster 2-3 business day delivery, while other states receive deliveries within 5-7 business days.&quot;</span><span class="hljs-comment">//答案内容，需包含地理关键词，与页面展示的FAQ一致</span>
+                        }
+                    },
+                    {
+                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Do you offer wholesale pricing for commercial cabinetry projects?&quot;</span>,<span class="hljs-comment">//批发场景高频问题</span>
+                        <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                            <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Yes! We offer competitive wholesale pricing for commercial and engineering-grade cabinetry projects across the Midwest. The minimum order quantity for wholesale orders is 50 units, and we provide on-site measurement and custom installation services in Colorado, Nebraska, and Missouri.&quot;</span>
+                        }
+                    },
+                    {
+                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;How long does custom cabinet installation take in Omaha, NE?&quot;</span>,<span class="hljs-comment">//本地服务时效高频问题</span>
+                        <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                            <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;For custom cabinet installation in Omaha, NE, our team typically completes the project within 3-5 business days after delivery, depending on the size and complexity of the project.&quot;</span>
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p><strong>有框橱柜页Schema：集合页（FAQ+权威信息关联）</strong>：</p>
+<pre><code class="language-html">
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>, <span class="hljs-comment">// 声明结构化数据遵循的上下文标准（固定为schema.org）</span>
+    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;CollectionPage&quot;</span>, <span class="hljs-comment">// 页面类型：集合页（对应橱柜分类列表页，区别于单一商品详情页）</span>
+    <span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/category?category_cd=ELC0001FC#collection&quot;</span>, <span class="hljs-comment">// 该页面的唯一标识ID，用于层级关联</span>
+    <span class="hljs-string">&quot;url&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/category?category_cd=ELC0001FC&quot;</span>, <span class="hljs-comment">// 页面的完整URL地址</span>
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Framed Cabinetry&quot;</span>, <span class="hljs-comment">// 页面名称（对应H1核心关键词，需与页面标题一致）</span>
+    <span class="hljs-string">&quot;inLanguage&quot;</span>: <span class="hljs-string">&quot;en-US&quot;</span>, <span class="hljs-comment">// 页面使用的语言（英文，美国地区）</span>
+    <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Explore premium framed cabinetry designed for kitchens, bathrooms, and custom projects. Shop high-quality framed cabinet styles from Everlasting Cabinetry.&quot;</span>, <span class="hljs-comment">// 页面描述融入产品核心卖点</span>
+    <span class="hljs-string">&quot;isPartOf&quot;</span>: {<span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/category?category_cd=ELC0001#collection&quot;</span>}, <span class="hljs-comment">// 关联上级页面ID（表示该有框橱柜页属于橱柜总分类页）</span>
+    <span class="hljs-string">&quot;about&quot;</span>: {<span class="hljs-string">&quot;@id&quot;</span>: <span class="hljs-string">&quot;https://www.everlastingcabinetry.com/#organization&quot;</span>}, <span class="hljs-comment">// 关联企业主体ID（强化页面与品牌的归属关系，继承企业权威资质）</span>
+    <span class="hljs-string">&quot;mainEntity&quot;</span>: { <span class="hljs-comment">// 页面核心实体信息（该分类页的商品目录核心内容+FAQ）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;ItemList&quot;</span>,<span class="hljs-comment">// 整合商品目录+FAQ的列表类型</span>
+        <span class="hljs-string">&quot;itemListElement&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;ListItem&quot;</span>, <span class="hljs-comment">// 列表项1：商品目录信息</span>
+                <span class="hljs-string">&quot;position&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// 排序位置</span>
+                <span class="hljs-string">&quot;item&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OfferCatalog&quot;</span>, <span class="hljs-comment">// 实体类型：商品目录（适配分类页批量商品展示场景）</span>
+                    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Framed Cabinetry Products&quot;</span>, <span class="hljs-comment">// 商品目录名称（对应分类页核心商品集合名称）</span>
+                    <span class="hljs-string">&quot;itemListElement&quot;</span>: [ <span class="hljs-comment">// 目录下的商品列表项（支持多个ListItem，此处为分类级核心项）</span>
+                        {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;ListItem&quot;</span>, <span class="hljs-comment">// 列表项类型（标识为目录中的单个列表条目）</span>
+                            <span class="hljs-string">&quot;position&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// 列表项排序位置（多个条目时按顺序标注，此处仅1个核心分类项）</span>
+                            <span class="hljs-string">&quot;itemOffered&quot;</span>: { <span class="hljs-comment">// 列表项提供的商品/服务核心信息</span>
+                                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Product&quot;</span>, <span class="hljs-comment">// 商品类型（标识为产品，区别于服务类）</span>
+                                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Framed Cabinetry&quot;</span>, <span class="hljs-comment">// 商品名称（分类级商品名称，非单一SKU）</span>
+                                <span class="hljs-string">&quot;category&quot;</span>: <span class="hljs-string">&quot;Cabinetry&quot;</span>, <span class="hljs-comment">// 商品所属大品类（用于搜索引擎识别商品类目）</span>
+                                <span class="hljs-string">&quot;areaServed&quot;</span>: [ <span class="hljs-comment">// GEO优化核心字段：商品服务覆盖区域（适配地理相关搜索）</span>
+                                    {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Colorado&quot;</span>}, <span class="hljs-comment">// 覆盖州1：科罗拉多州</span>
+                                    {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Nebraska&quot;</span>}, <span class="hljs-comment">// 覆盖州2：内布拉斯加州</span>
+                                    {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Missouri&quot;</span>} <span class="hljs-comment">// 覆盖州3：密苏里州</span>
+                                ],
+                                <span class="hljs-string">&quot;hasMerchantReturnPolicy&quot;</span>: {<span class="hljs-comment">//可选：退货政策（强化本地服务属性）</span>
+                                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;MerchantReturnPolicy&quot;</span>,
+                                    <span class="hljs-string">&quot;applicableRegion&quot;</span>: [<span class="hljs-string">&quot;Colorado&quot;</span>,<span class="hljs-string">&quot;Nebraska&quot;</span>,<span class="hljs-string">&quot;Missouri&quot;</span>],<span class="hljs-comment">//退货政策适用区域</span>
+                                    <span class="hljs-string">&quot;returnMethod&quot;</span>: <span class="hljs-string">&quot;https://schema.org/ReturnInPerson&quot;</span>,<span class="hljs-comment">//退货方式：到店退货</span>
+                                    <span class="hljs-string">&quot;returnPeriod&quot;</span>: {
+                                        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;QuantitativeValue&quot;</span>,
+                                        <span class="hljs-string">&quot;value&quot;</span>: <span class="hljs-number">30</span>,<span class="hljs-comment">//退货周期30天</span>
+                                        <span class="hljs-string">&quot;unitCode&quot;</span>: <span class="hljs-string">&quot;DAY&quot;</span>
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;ListItem&quot;</span>, <span class="hljs-comment">// 列表项2：分类页专属FAQ</span>
+                <span class="hljs-string">&quot;position&quot;</span>: <span class="hljs-number">2</span>,
+                <span class="hljs-string">&quot;item&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,
+                    <span class="hljs-string">&quot;mainEntity&quot;</span>: [
+                        {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;What materials are your framed cabinets made of?&quot;</span>,<span class="hljs-comment">//分类页商品相关问题</span>
+                            <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                                <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Our framed cabinets are crafted from high-quality solid wood and plywood, sourced from sustainable forests in the Midwest. All materials meet NKBA certification standards for durability and safety.&quot;</span><span class="hljs-comment">//答案关联权威认证（NKBA），提升可信度</span>
+                            }
+                        },
+                        {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Do you offer custom sizing for framed cabinets in Iowa?&quot;</span>,<span class="hljs-comment">//地理+商品定制问题</span>
+                            <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                                <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Yes, we offer fully custom sizing for framed cabinets in Iowa and all our service states. Our team can create cabinets tailored to your kitchen or bathroom dimensions, with free on-site measurements available for Iowa customers.&quot;</span>
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p><strong>零售商品完整标签示例（FAQ+权威信息）</strong>：商品详情页</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>, <span class="hljs-comment">// 声明结构化数据遵循的核心上下文标准（固定为schema.org）</span>
+    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Product&quot;</span>, <span class="hljs-comment">// 页面/实体类型：零售商品（区别于集合页、服务类等类型）</span>
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;XX品牌运动鞋（男款）&quot;</span>, <span class="hljs-comment">// 商品名称（需与页面展示的商品名称完全一致，含品牌/品类/规格）</span>
+    <span class="hljs-string">&quot;sku&quot;</span>: <span class="hljs-string">&quot;SP-M-2024001&quot;</span>, <span class="hljs-comment">// 商品唯一编码（SKU，零售商品必选字段，用于标识具体商品规格）</span>
+    <span class="hljs-string">&quot;availability&quot;</span>: <span class="hljs-string">&quot;https://schema.org/InStock&quot;</span>, <span class="hljs-comment">// 库存状态（枚举值，InStock=有货，OutOfStock=缺货，需与页面库存展示一致）</span>
+    <span class="hljs-string">&quot;availableAtOrFrom&quot;</span>: { <span class="hljs-comment">// 核心GEO字段：商品发货/可获取的地点（适配零售场景地理属性标注）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-comment">// 子类型：地点（用于定义发货仓/自提点等物理位置）</span>
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;XX网站北京通州仓&quot;</span>, <span class="hljs-comment">// 发货仓/自提点名称（便于搜索引擎识别具体仓储节点）</span>
+        <span class="hljs-string">&quot;address&quot;</span>: { <span class="hljs-comment">// 地点的详细邮政地址（GEO优化核心，需精准到区/县级别）</span>
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;PostalAddress&quot;</span>, <span class="hljs-comment">// 子类型：邮政地址（遵循schema.org地址规范）</span>
+            <span class="hljs-string">&quot;streetAddress&quot;</span>: <span class="hljs-string">&quot;北京市通州区XX物流园A区3栋&quot;</span>, <span class="hljs-comment">// 街道级详细地址（需完整、准确）</span>
+            <span class="hljs-string">&quot;addressLocality&quot;</span>: <span class="hljs-string">&quot;通州区&quot;</span>, <span class="hljs-comment">// 地址所属区县（GEO精准化关键字段）</span>
+            <span class="hljs-string">&quot;addressRegion&quot;</span>: <span class="hljs-string">&quot;北京市&quot;</span>, <span class="hljs-comment">// 地址所属省市/州（适配区域搜索匹配）</span>
+            <span class="hljs-string">&quot;postalCode&quot;</span>: <span class="hljs-string">&quot;101100&quot;</span>, <span class="hljs-comment">// 邮政编码（提升地址精准度，辅助搜索引擎地理识别）</span>
+            <span class="hljs-string">&quot;addressCountry&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span> <span class="hljs-comment">// 国家代码（ISO 3166-1 alpha-2格式，CN=中国，US=美国等）</span>
+        },
+        <span class="hljs-string">&quot;geo&quot;</span>: { <span class="hljs-comment">// 地理坐标（可选但推荐，进一步强化GEO属性，适配地图类搜索）</span>
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;GeoCoordinates&quot;</span>, <span class="hljs-comment">// 子类型：地理坐标</span>
+            <span class="hljs-string">&quot;latitude&quot;</span>: <span class="hljs-number">39.928800</span>, <span class="hljs-comment">// 纬度（精准至6位小数，需与发货仓实际位置一致）</span>
+            <span class="hljs-string">&quot;longitude&quot;</span>: <span class="hljs-number">116.657200</span> <span class="hljs-comment">// 经度（精准至6位小数，需与发货仓实际位置一致）</span>
+        }
+    },
+    <span class="hljs-string">&quot;offers&quot;</span>: { <span class="hljs-comment">// 商品报价信息（零售场景核心交易属性）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Offer&quot;</span>, <span class="hljs-comment">// 子类型：报价</span>
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-string">&quot;399.00&quot;</span>, <span class="hljs-comment">// 商品售价（需与页面展示价格一致，保留2位小数）</span>
+        <span class="hljs-string">&quot;priceCurrency&quot;</span>: <span class="hljs-string">&quot;CNY&quot;</span> <span class="hljs-comment">// 价格货币类型（ISO 4217代码，CNY=人民币，USD=美元等）</span>
+    },
+    <span class="hljs-string">&quot;certification&quot;</span>: [<span class="hljs-comment">//：商品权威认证（提升商品可信度）</span>
+        {
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Certificate&quot;</span>,
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;国家质量认证中心产品质量认证&quot;</span>,<span class="hljs-comment">//认证名称</span>
+            <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;中国国家质量认证中心&quot;</span>,<span class="hljs-comment">//颁发机构</span>
+            <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2023-01-01&quot;</span><span class="hljs-comment">//认证生效时间</span>
+        }
+    ],
+    <span class="hljs-string">&quot;mainEntity&quot;</span>: {<span class="hljs-comment">//：商品详情页FAQ（解答用户高频问题）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,
+        <span class="hljs-string">&quot;mainEntity&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;这款运动鞋从北京通州仓发货后，多久能到朝阳区？&quot;</span>,<span class="hljs-comment">//地理+配送时效问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;从北京通州仓发货至朝阳区，同城配送时效为1个工作日，下单后当天16点前付款可次日送达。&quot;</span>
+                }
+            },
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;商品是否支持北京地区到店自提？&quot;</span>,<span class="hljs-comment">//本地服务问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;支持的，您可选择北京通州仓自提点到店自提，自提时间为周一至周五9:00-17:30，周末暂不支持自提。&quot;</span>
+                }
+            }
+        ]
+    }
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p><strong>批发商品完整标签示例（FAQ+权威信息）</strong>：</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>, <span class="hljs-comment">// 声明结构化数据遵循的核心上下文标准（固定为schema.org，搜索引擎通用解析规范）</span>
+    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Product&quot;</span>, <span class="hljs-comment">// 实体类型：单一商品（批发场景下核心标注类型，区别于集合页/服务类）</span>
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;XX品牌建筑防水涂料（50kg/桶）&quot;</span>, <span class="hljs-comment">// 商品名称（需与页面展示名称完全一致，含品牌、品类、规格，适配批发场景规格标注）</span>
+    <span class="hljs-string">&quot;sku&quot;</span>: <span class="hljs-string">&quot;PF-B-2024005&quot;</span>, <span class="hljs-comment">// 商品唯一编码（批发商品必选字段，PF前缀标识批发类型，便于区分零售SKU）</span>
+    <span class="hljs-string">&quot;availability&quot;</span>: <span class="hljs-string">&quot;https://schema.org/InStock&quot;</span>, <span class="hljs-comment">// 库存状态（枚举值，InStock=有货，需与对应发货仓库存状态一致，批发场景需关联区域库存）</span>
+    <span class="hljs-string">&quot;availableAtOrFrom&quot;</span>: { <span class="hljs-comment">// 核心GEO字段：批发商品发货/可获取的物理地点（适配GEO优化，精准标注发货仓）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-comment">// 子类型：地点（定义发货仓的物理位置属性）</span>
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;XX网站天津武清仓&quot;</span>, <span class="hljs-comment">// 发货仓名称（便于搜索引擎识别具体仓储节点，批发场景需明确仓点名称）</span>
+        <span class="hljs-string">&quot;address&quot;</span>: { <span class="hljs-comment">// 发货仓详细邮政地址（GEO优化核心，需精准到区/县级别）</span>
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;PostalAddress&quot;</span>, <span class="hljs-comment">// 子类型：邮政地址（遵循schema.org地址规范）</span>
+            <span class="hljs-string">&quot;streetAddress&quot;</span>: <span class="hljs-string">&quot;天津市武清区XX工业园B区8号&quot;</span>, <span class="hljs-comment">// 街道级详细地址（需完整、准确，批发场景便于物流对接）</span>
+            <span class="hljs-string">&quot;addressLocality&quot;</span>: <span class="hljs-string">&quot;武清区&quot;</span>, <span class="hljs-comment">// 地址所属区县（GEO精准化关键字段，批发配送范围匹配核心）</span>
+            <span class="hljs-string">&quot;addressRegion&quot;</span>: <span class="hljs-string">&quot;天津市&quot;</span>, <span class="hljs-comment">// 地址所属省市（适配区域批发覆盖范围识别）</span>
+            <span class="hljs-string">&quot;postalCode&quot;</span>: <span class="hljs-string">&quot;301700&quot;</span>, <span class="hljs-comment">// 邮政编码（提升地址精准度，辅助搜索引擎地理识别）</span>
+            <span class="hljs-string">&quot;addressCountry&quot;</span>: <span class="hljs-string">&quot;CN&quot;</span> <span class="hljs-comment">// 国家代码（ISO 3166-1 alpha-2格式，CN=中国，批发场景明确跨境/境内属性）</span>
+        },
+        <span class="hljs-string">&quot;geo&quot;</span>: { <span class="hljs-comment">// 地理坐标（批发场景推荐标注，强化GEO属性，适配地图类批发商户搜索）</span>
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;GeoCoordinates&quot;</span>, <span class="hljs-comment">// 子类型：地理坐标</span>
+            <span class="hljs-string">&quot;latitude&quot;</span>: <span class="hljs-number">39.376400</span>, <span class="hljs-comment">// 纬度（精准至6位小数，需与发货仓实际位置一致）</span>
+            <span class="hljs-string">&quot;longitude&quot;</span>: <span class="hljs-number">117.049700</span> <span class="hljs-comment">// 经度（精准至6位小数，需与发货仓实际位置一致）</span>
+        }
+    },
+    <span class="hljs-string">&quot;offers&quot;</span>: { <span class="hljs-comment">// 批发商品核心报价信息（批发场景专属嵌套字段，标注批量采购规则）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Offer&quot;</span>, <span class="hljs-comment">// 子类型：报价（适配批发场景的交易属性标注）</span>
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-string">&quot;280.00&quot;</span>, <span class="hljs-comment">// 批发单价（需与页面展示的批量采购单价一致，保留2位小数）</span>
+        <span class="hljs-string">&quot;priceCurrency&quot;</span>: <span class="hljs-string">&quot;CNY&quot;</span>, <span class="hljs-comment">// 价格货币类型（ISO 4217代码，CNY=人民币）</span>
+        <span class="hljs-string">&quot;eligibleRegion&quot;</span>: <span class="hljs-string">&quot;京津冀地区&quot;</span>, <span class="hljs-comment">// 批发覆盖区域（批发场景必选，明确可供货的地理范围，适配“京津冀防水涂料批发”等搜索）</span>
+        <span class="hljs-string">&quot;minimumOrderQuantity&quot;</span>: <span class="hljs-number">10</span>, <span class="hljs-comment">// 批发最小起订量（批发场景核心字段，标注最低采购数量，区分零售场景）</span>
+        <span class="hljs-string">&quot;availableDeliveryMethod&quot;</span>: <span class="hljs-string">&quot;https://schema.org/LocalDelivery&quot;</span> <span class="hljs-comment">// 配送方式（枚举值，LocalDelivery=本地配送，适配批发场景的配送服务标注）</span>
+    },
+    <span class="hljs-string">&quot;certification&quot;</span>: [<span class="hljs-comment">//：批发商品权威认证（工程/批发场景核心，提升企业信任度）</span>
+        {
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Certificate&quot;</span>,
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;建筑防水材料国家检测中心合格认证&quot;</span>,<span class="hljs-comment">//认证名称</span>
+            <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;国家建筑材料测试中心&quot;</span>,<span class="hljs-comment">//颁发机构</span>
+            <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2022-06-01&quot;</span>,
+            <span class="hljs-string">&quot;validUntil&quot;</span>: <span class="hljs-string">&quot;2027-05-31&quot;</span>
+        }
+    ],
+    <span class="hljs-string">&quot;mainEntity&quot;</span>: {<span class="hljs-comment">//：批发商品FAQ（工程客户高频问题）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,
+        <span class="hljs-string">&quot;mainEntity&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;京津冀地区批发订货后，多久能配送到位？&quot;</span>,<span class="hljs-comment">//批发配送时效问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;京津冀地区批发订货，天津武清仓发货后，河北省内1-2个工作日送达，北京、天津同城次日达，最小起订量10桶及以上可免费配送至指定工地。&quot;</span>
+                }
+            },
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;工程采购是否支持先验货再付款？&quot;</span>,<span class="hljs-comment">//工程采购信任度问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;支持的，针对京津冀地区工程采购客户，订单金额满5万元可享受先验货再付款服务，验货地点可选择我方天津武清仓或贵司指定工地。&quot;</span>
+                }
+            }
+        ]
+    }
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>必选字段：商品名称、SKU（或商品编码）、库存状态、发货地（含详细地址、区域）、地理坐标（经纬度）；必选（权威/FAQ）：核心页面需包含FAQ模块（至少2组问答）、企业/商品权威资质（至少1项）；可选字段：产地、区域定价、本地退货政策、批发最小起订量（批发商品专属）、商品认证信息。
+核心说明：发货地需精准到区/县级别，经纬度精准至6位小数；库存状态需与对应区域关联（如“北京仓现货”“上海仓缺货”），批发商品需额外标注覆盖的批发区域；FAQ需包含地理相关问题，答案需与页面展示内容一致，权威资质需真实有效，禁止虚构。</p>
+<h4 id="312-配送服务标注faq权威信息适配配送场景">3.1.2 配送服务标注（FAQ+权威信息，适配配送场景）</h4>
+<p>适用页面：首页、商品列表页、商品详情页、配送说明页，核心类型为“DeliveryService”，标注配送范围、上门服务时效、安装服务覆盖区域、配送相关FAQ、配送服务资质，适配“本地橱柜配送”“区域安装服务”等搜索需求。</p>
+<p><strong>完整标签示例（适配Everlasting Cabinetry业务，FAQ+权威）</strong>：</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>, <span class="hljs-comment">// 声明结构化数据遵循的核心标准（schema.org为搜索引擎通用解析规范）</span>
+    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;DeliveryService&quot;</span>, <span class="hljs-comment">// 实体类型：配送服务（适配&quot;本地橱柜配送&quot;&quot;区域安装服务&quot;等地理相关搜索）</span>
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Everlasting Cabinetry Midwest Delivery &amp; Installation Service&quot;</span>, <span class="hljs-comment">// 配送服务名称（需包含品牌+覆盖区域+服务类型，强化地理关联）</span>
+    <span class="hljs-string">&quot;areaServed&quot;</span>: [ <span class="hljs-comment">// 核心GEO字段：配送/安装服务覆盖的地理区域（适配Midwest 7个州的业务范围）</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Colorado&quot;</span>}, <span class="hljs-comment">// 子类型：地理地点，标注覆盖的科罗拉多州</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Iowa&quot;</span>}, <span class="hljs-comment">// 爱荷华州</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Kansas&quot;</span>}, <span class="hljs-comment">// 堪萨斯州</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Missouri&quot;</span>}, <span class="hljs-comment">// 密苏里州</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Nebraska&quot;</span>}, <span class="hljs-comment">// 内布拉斯加州（核心服务州，配送时效更优）</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;North Dakota&quot;</span>}, <span class="hljs-comment">// 北达科他州</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;South Dakota&quot;</span>} <span class="hljs-comment">// 南达科他州</span>
+    ],
+    <span class="hljs-string">&quot;deliveryTime&quot;</span>: { <span class="hljs-comment">// 配送时效规则（区分核心州与其他州，强化本地服务属性）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OpeningHoursSpecification&quot;</span>, <span class="hljs-comment">// 子类型：营业时间/时效规范（复用该类型标注配送时效）</span>
+        <span class="hljs-string">&quot;dayOfWeek&quot;</span>: [<span class="hljs-string">&quot;Monday&quot;</span>,<span class="hljs-string">&quot;Tuesday&quot;</span>,<span class="hljs-string">&quot;Wednesday&quot;</span>,<span class="hljs-string">&quot;Thursday&quot;</span>,<span class="hljs-string">&quot;Friday&quot;</span>], <span class="hljs-comment">// 配送服务可执行的工作日</span>
+        <span class="hljs-string">&quot;opens&quot;</span>: <span class="hljs-string">&quot;09:00&quot;</span>, <span class="hljs-comment">// 每日配送服务开始时间</span>
+        <span class="hljs-string">&quot;closes&quot;</span>: <span class="hljs-string">&quot;17:30&quot;</span>, <span class="hljs-comment">// 每日配送服务结束时间</span>
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Delivery within Nebraska: 2-3 business days; Delivery to other Midwest states: 5-7 business days&quot;</span> <span class="hljs-comment">// 差异化时效说明（核心州更快，适配本地搜索需求）</span>
+    },
+    <span class="hljs-string">&quot;availableDeliveryMethod&quot;</span>: <span class="hljs-string">&quot;https://schema.org/LocalDelivery&quot;</span>, <span class="hljs-comment">// 配送方式：本地配送（枚举值，区别于快递/自提，强化本地服务标签）</span>
+    <span class="hljs-string">&quot;hasOfferCatalog&quot;</span>: { <span class="hljs-comment">// 嵌套字段：配送服务包含的增值服务目录（此处为橱柜安装服务）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;OfferCatalog&quot;</span>, <span class="hljs-comment">// 子类型：服务目录</span>
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Midwest Installation Services&quot;</span>, <span class="hljs-comment">// 安装服务目录名称（关联Midwest区域）</span>
+        <span class="hljs-string">&quot;itemListElement&quot;</span>: [ <span class="hljs-comment">// 服务列表项（支持多个服务，按position排序）</span>
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;ListItem&quot;</span>, <span class="hljs-comment">// 子类型：列表项</span>
+                <span class="hljs-string">&quot;position&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// 列表排序（多个服务时按优先级标注）</span>
+                <span class="hljs-string">&quot;itemOffered&quot;</span>: { <span class="hljs-comment">// 具体提供的服务</span>
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Service&quot;</span>, <span class="hljs-comment">// 子类型：服务（区别于商品）</span>
+                    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Cabinet Installation Service&quot;</span>, <span class="hljs-comment">// 服务名称：橱柜安装服务</span>
+                    <span class="hljs-string">&quot;areaServed&quot;</span>: [<span class="hljs-string">&quot;Colorado&quot;</span>,<span class="hljs-string">&quot;Iowa&quot;</span>,<span class="hljs-string">&quot;Nebraska&quot;</span>,<span class="hljs-string">&quot;Missouri&quot;</span>], <span class="hljs-comment">// 安装服务覆盖的核心州（精准标注，适配&quot;XX州橱柜安装&quot;搜索）</span>
+                    <span class="hljs-string">&quot;certification&quot;</span>: [<span class="hljs-comment">//：安装服务权威资质</span>
+                        {
+                            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Certificate&quot;</span>,
+                            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Midwest Contractor License for Cabinet Installation&quot;</span>,<span class="hljs-comment">//安装资质名称</span>
+                            <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;Nebraska Department of Labor&quot;</span>,<span class="hljs-comment">//颁发机构（内布拉斯加州劳工部）</span>
+                            <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2021-05-01&quot;</span>
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    <span class="hljs-string">&quot;mainEntity&quot;</span>: {<span class="hljs-comment">//：配送服务FAQ</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,
+        <span class="hljs-string">&quot;mainEntity&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Do you offer emergency delivery for cabinetry in Omaha, NE?&quot;</span>,<span class="hljs-comment">//本地应急配送问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Yes, we offer emergency delivery services for cabinetry in Omaha, NE for urgent projects. Emergency deliveries are available Monday-Friday with a 24-hour notice, and a small premium fee applies.&quot;</span>
+                }
+            },
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Is installation included with delivery in Colorado?&quot;</span>,<span class="hljs-comment">//配送+安装关联问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Installation is included with delivery for all cabinetry orders over $5,000 in Colorado. For smaller orders, we offer discounted installation rates starting at $150 per project.&quot;</span>
+                }
+            }
+        ]
+    }
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<h4 id="313-批发业务专属标注faq权威信息批发场景">3.1.3 批发业务专属标注（FAQ+权威信息，批发场景）</h4>
+<p>适用页面：批发专区首页、工程合作页、橱柜分类页（工程款），核心类型为“Offer”（嵌套于Product类型中），标注批发覆盖范围、工程对接方式、本地测量安装服务、批发FAQ、工程资质，适配工程客户需求。</p>
+<p><strong>工程批发专属标签示例（FAQ+权威）</strong>：</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/ld+json&quot;</span>&gt;</span><span class="language-javascript">
+{
+    <span class="hljs-string">&quot;@context&quot;</span>: <span class="hljs-string">&quot;https://schema.org&quot;</span>, <span class="hljs-comment">// 声明结构化数据遵循的核心标准（schema.org为搜索引擎通用解析规范，工程批发场景需严格遵循）</span>
+    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Product&quot;</span>, <span class="hljs-comment">// 实体类型：工程批发类商品（适配&quot;工程橱柜批发&quot;等精准搜索，区别于零售商品标注）</span>
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Commercial Framed Cabinetry (Engineering Grade)&quot;</span>, <span class="hljs-comment">// 商品名称（需包含「商用/工程级」标识，适配工程客户搜索习惯，如&quot;Commercial Cabinetry wholesale&quot;）</span>
+    <span class="hljs-string">&quot;sku&quot;</span>: <span class="hljs-string">&quot;ELC-ENG-FC-001&quot;</span>, <span class="hljs-comment">// 工程商品专属SKU（ENG前缀标识工程级，FC=有框橱柜，编码规则需与后端工程商品库一致）</span>
+    <span class="hljs-string">&quot;offers&quot;</span>: { <span class="hljs-comment">// 工程批发核心报价/服务规则（批发场景核心嵌套字段，标注批量采购条件与配套服务）</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Offer&quot;</span>, <span class="hljs-comment">// 子类型：批发报价（适配工程客户批量采购的交易属性标注）</span>
+        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-string">&quot;220.00&quot;</span>, <span class="hljs-comment">// 工程批发单价（需与工程报价单、页面展示的批量采购单价一致，保留2位小数，货币为USD）</span>
+        <span class="hljs-string">&quot;priceCurrency&quot;</span>: <span class="hljs-string">&quot;USD&quot;</span>, <span class="hljs-comment">// 价格货币类型（ISO 4217代码，USD=美元，适配美国中西部工程业务场景）</span>
+        <span class="hljs-string">&quot;eligibleRegion&quot;</span>: [<span class="hljs-string">&quot;Colorado&quot;</span>,<span class="hljs-string">&quot;Iowa&quot;</span>,<span class="hljs-string">&quot;Kansas&quot;</span>,<span class="hljs-string">&quot;Missouri&quot;</span>,<span class="hljs-string">&quot;Nebraska&quot;</span>,<span class="hljs-string">&quot;North Dakota&quot;</span>,<span class="hljs-string">&quot;South Dakota&quot;</span>], <span class="hljs-comment">// 批发供货覆盖区域（工程场景必选，明确7个核心服务州，适配&quot;Midwest commercial cabinetry wholesale&quot;搜索）</span>
+        <span class="hljs-string">&quot;minimumOrderQuantity&quot;</span>: <span class="hljs-number">50</span>, <span class="hljs-comment">// 批发最小起订量（工程场景核心字段，标注最低采购数量，区别于零售场景，需与业务规则一致）</span>
+        <span class="hljs-string">&quot;availableDeliveryMethod&quot;</span>: <span class="hljs-string">&quot;https://schema.org/LocalDelivery&quot;</span>, <span class="hljs-comment">// 配送方式：本地配送（枚举值，适配工程场景的区域配送属性，强化&quot;本地工程供货&quot;标签）</span>
+        <span class="hljs-string">&quot;includesService&quot;</span>: { <span class="hljs-comment">// 工程批发配套增值服务（工程场景专属字段，标注含上门测量/定制安装，提升工程客户转化）</span>
+            <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Service&quot;</span>, <span class="hljs-comment">// 子类型：服务（定义工程配套服务属性）</span>
+            <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;On-Site Measurement &amp; Custom Installation&quot;</span>, <span class="hljs-comment">// 服务名称：上门测量+定制安装（工程橱柜核心服务，适配&quot;Omaha cabinet installation&quot;等地理搜索）</span>
+            <span class="hljs-string">&quot;areaServed&quot;</span>: [<span class="hljs-string">&quot;Colorado&quot;</span>,<span class="hljs-string">&quot;Nebraska&quot;</span>,<span class="hljs-string">&quot;Missouri&quot;</span>], <span class="hljs-comment">// 配套服务覆盖州（精准标注可提供上门服务的核心州，适配&quot;Colorado on-site cabinet measurement&quot;搜索）</span>
+            <span class="hljs-string">&quot;certification&quot;</span>: [<span class="hljs-comment">//：工程服务权威资质</span>
+                {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Certificate&quot;</span>,
+                    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Commercial Construction Service Certification&quot;</span>,<span class="hljs-comment">//商用建筑服务认证</span>
+                    <span class="hljs-string">&quot;issuer&quot;</span>: <span class="hljs-string">&quot;Midwest Construction Association&quot;</span>,<span class="hljs-comment">//颁发机构</span>
+                    <span class="hljs-string">&quot;validFrom&quot;</span>: <span class="hljs-string">&quot;2022-01-01&quot;</span>,
+                    <span class="hljs-string">&quot;validUntil&quot;</span>: <span class="hljs-string">&quot;2026-12-31&quot;</span>
+                }
+            ]
+        }
+    },
+    <span class="hljs-string">&quot;areaServed&quot;</span>: [ <span class="hljs-comment">// 商品核心服务覆盖区域（GEO优化核心字段，标注商品主要触达的工程客户区域）</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Colorado&quot;</span>}, <span class="hljs-comment">// 子类型：地理地点，标注科罗拉多州（工程业务核心覆盖州）</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Iowa&quot;</span>}, <span class="hljs-comment">// 爱荷华州（工程批发覆盖州，适配本地装修公司/地产商搜索）</span>
+        {<span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Place&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Nebraska&quot;</span>} <span class="hljs-comment">// 内布拉斯加州（核心运营州，强化&quot;Omaha commercial cabinetry&quot;等本地工程搜索匹配度）</span>
+    ],
+    <span class="hljs-string">&quot;mainEntity&quot;</span>: {<span class="hljs-comment">//：工程批发FAQ</span>
+        <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;FAQPage&quot;</span>,
+        <span class="hljs-string">&quot;mainEntity&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;What payment terms are available for commercial cabinetry wholesale in Missouri?&quot;</span>,<span class="hljs-comment">//工程付款条款问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;For commercial cabinetry wholesale orders in Missouri, we offer net-30 payment terms for established contractors and developers. A 50% deposit is required upfront, with the remaining balance due upon delivery.&quot;</span>
+                }
+            },
+            {
+                <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Question&quot;</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Can you provide custom engineering-grade cabinets for large-scale projects in Nebraska?&quot;</span>,<span class="hljs-comment">//工程定制问题</span>
+                <span class="hljs-string">&quot;acceptedAnswer&quot;</span>: {
+                    <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;Answer&quot;</span>,
+                    <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;Yes, we specialize in custom engineering-grade cabinets for large-scale commercial and residential projects in Nebraska. Our team works closely with project managers to create custom designs, with lead times ranging from 2-4 weeks depending on project size.&quot;</span>
+                }
+            }
+        ]
+    }
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>必选字段：批发覆盖区域、最小起订量、批发单价、对接联系方式；必选：工程批发FAQ（至少2组）、工程/服务权威资质（至少1项）；可选字段：批量折扣规则、区域供货周期、本地自提地点（批发自提专属）、付款条款说明。
+核心说明：批发覆盖区域需明确（如“京津冀地区”“长三角核心城市”），对接联系方式需与区域匹配，便于本地商户联系；FAQ需聚焦工程客户高频问题（付款、定制、配送、安装），权威资质需与工程业务相关（如施工认证、商用产品认证）。</p>
+<h3 id="32-字段填写核心原则">3.2 字段填写核心原则</h3>
+<ol>
+<li>一致性原则：JSON-LD中的所有地理字段（地址、区域、经纬度、配送范围等）、FAQ字段、权威资质字段，必须与前端页面展示内容、后端接口返回数据完全一致，禁止出现数据冲突。</li>
+<li>完整性原则：必选字段不可缺失，FAQ模块核心页面（首页、商品详情页、批发页）至少包含2组问答，权威资质至少标注1项真实有效认证；可选字段按需补充，提升数据丰富度。</li>
+<li>规范性原则：地址格式统一为“省+市+区+详细地址”，国家代码统一填写“CN”/“US”；经纬度需精准，可通过地图工具获取；时间格式统一（如配送时效标注“周一至周日 09:00-18:00”）；FAQ问答需简洁明了，答案需包含地理/业务核心关键词；权威资质需标注名称、颁发机构、有效期（如有）。</li>
+</ol>
+<h3 id="33-禁止事项">3.3 禁止事项</h3>
+<ul>
+<li>禁止添加页面未展示的地理信息、FAQ内容、权威资质（如虚构发货仓、编造认证信息），否则可能被搜索引擎判定为作弊，降低网站权重。</li>
+<li>禁止字段冗余或格式错误（如经纬度保留位数不足、地址缺失区域信息、FAQ问答格式不完整），避免搜索引擎解析失败。</li>
+<li>禁止将JSON-LD放入异步加载的JavaScript文件中，搜索引擎可能无法抓取异步内容，导致结构化数据失效。</li>
+<li>禁止FAQ问答堆砌关键词，需符合自然语言逻辑，与用户真实搜索意图匹配。</li>
+</ul>
+<h2 id="四json-ld-及-geo-信息适配页面清单faq权威信息适配">四、JSON-LD 及 GEO 信息适配页面清单（FAQ/权威信息适配）</h2>
+<table>
+<thead>
+<tr>
+<th>页面类型</th>
+<th>核心JSON-LD类型</th>
+<th>适配内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首页</td>
+<td>Organization+WebSite+CollectionPage</td>
+<td>企业权威资质、全站通用FAQ（地理/服务类）</td>
+</tr>
+<tr>
+<td>商品分类页（如橱柜页）</td>
+<td>CollectionPage</td>
+<td>分类专属FAQ（商品+地理）、商品类目认证</td>
+</tr>
+<tr>
+<td>零售商品详情页</td>
+<td>Product</td>
+<td>商品专属FAQ（配送/自提/本地服务）、商品认证</td>
+</tr>
+<tr>
+<td>批发商品详情页</td>
+<td>Product（嵌套Offer）</td>
+<td>批发FAQ（付款/配送/工程定制）、工程资质</td>
+</tr>
+<tr>
+<td>配送说明页</td>
+<td>DeliveryService</td>
+<td>配送FAQ（时效/应急配送/安装）、配送服务资质</td>
+</tr>
+<tr>
+<td>批发专区首页</td>
+<td>Product+Offer</td>
+<td>批发通用FAQ、企业工程类权威资质</td>
+</tr>
+<tr>
+<td>工程合作页</td>
+<td>Product+Service</td>
+<td>工程对接FAQ、本地工程服务资质</td>
+</tr>
+<tr>
+<td>联系页</td>
+<td>Organization+ContactPoint</td>
+<td>本地联系方式FAQ、企业认证信息</td>
+</tr>
+</tbody>
+</table>
+<h2 id="五geo-优化补充措施faq权威信息优化">五、GEO 优化补充措施（FAQ/权威信息优化）</h2>
+<h3 id="51-页面内容优化">5.1 页面内容优化</h3>
+<ol>
+<li>标题与描述优化：严格沿用指定的H1和元描述，核心优化方向为在页面副标题、内容描述中补充地理关键词，如橱柜页副标题“xxx for 地理位置”，避免关键词堆砌；FAQ模块标题可融入地理关键词（如“xxx - FAQ for 地理位置&amp;业务</li>
+<li>内容关联优化：在商品描述、服务说明中自然融入“地理位置+业务”等短语，贴合业务场景；FAQ模块需在页面可视化展示，与JSON-LD中的问答内容完全一致。</li>
+<li>图片优化：为产品图、案例图添加含地理关键词的alt标签，辅助搜索引擎识别区域属性；权威资质证书图片需添加alt标签，并在页面展示。</li>
+<li>FAQ可视化优化：核心页面（首页、商品详情页、批发页）需在显著位置展示FAQ模块，问答内容与JSON-LD同步，样式适配移动端，提升用户体验；FAQ问题需包含地理/批发/商品等核心关键词，答案需准确且包含业务卖点。</li>
+<li>权威信息展示：企业/商品/服务的权威资质需在页面“关于我们”“商品详情”“服务说明”模块可视化展示，标注认证名称、颁发机构、有效期，与JSON-LD中的certification/hasCredential字段一致。</li>
+</ol>
+<h3 id="52-搜索引擎对接优化">5.2 搜索引擎对接优化</h3>
+<ol>
+<li>Sitemap提交：按页面类型拆分Sitemap（如产品页Sitemap、功能页Sitemap），包含所有页面URL，标注lastmod字段（格式为YYYY-MM-DD），提交至谷歌搜索控制台、必应搜索资源平台（海外市场重点）/百度搜索资源平台（国内市场）；FAQ/权威信息的页面需优先标注lastmod，加速搜索引擎抓取。需包含的核心页面：首页、商品分类页面、商品详情页、FAQ聚合页（如有）。</li>
+<li>商户平台标注：在主流商户平台注册标注，包括谷歌商家档案（Google Business Profile）、Yelp、百度地图（针对华人客户），填写与网站一致的核心地址、电话及服务范围，标注企业权威资质，标注信息更新后同步更新网站Schema及页面内容。</li>
+<li>抓取权限优化：确保robots.txt未禁止抓取所有页面，动态URL（如分类页带参数URL）需实现静态化或添加canonical标签；核心页面（首页、橱柜分类页、联系页、FAQ页）添加内部链接，提升索引优先级，区域页面避免使用“noindex”标签。</li>
+</ol>
+<h3 id="动态url如分类页带参数url需实现静态化或添加canonical标签解释">动态URL（如分类页带参数URL）需实现静态化或添加canonical标签解释</h3>
+<p>例如
+主分类页：<a href="https://xxx.com/category/framed">https://xxx.com/category/framed</a>
+详细页：<a href="https://xxx.com/category/framed?pid=xxx">https://xxx.com/category/framed?pid=xxx</a>    内容和主分类页高度相似，会被搜索引擎判定为重复内容，分散主分类页的权重。
+解决
+给所有动态参数 URL 添加 canonical 标签（JSON-LD外）</p>
+<head>
+  <link rel="canonical" href="https://xxx.com/category/framed" />
+</head>
+<h2 id="六验证与监控faq权威信息验证">六、验证与监控（FAQ/权威信息验证</h2>
+<h3 id="61-json-ld有效性验证">6.1 JSON-LD有效性验证</h3>
+<ol>
+<li>工具验证：页面上线后，使用谷歌Rich Results Test、百度搜索资源平台结构化数据验证工具，输入页面URL或JSON-LD内容，检查是否存在语法错误、字段缺失、数据冲突等问题；重点验证FAQPage、Certificate/OrganizationRole类型字段的解析状态，确保无报错。</li>
+<li>人工校验：逐一核对页面展示的地理信息、FAQ内容、权威资质与JSON-LD字段，确保一致性；检查JSON-LD是否成功渲染至页面头部，无异步加载问题；核对FAQ问答数量、权威资质数量是否满足规范要求。</li>
+</ol>
+<h3 id="62-效果监控与优化调整">6.2 效果监控与优化调整</h3>
+<ol>
+<li>搜索控制台监控：通过百度搜索资源平台、谷歌搜索控制台，查看地理相关页面的索引情况、富媒体结果展示次数、点击量，分析JSON-LD是否生效；查看FAQ、权威信息相关的富摘要展示情况（如谷歌搜索结果中的FAQ折叠面板）。</li>
+<li>排名监控：定期跟踪核心地理关键词、权威/FAQ相关关键词的搜索排名，观察优化后排名变化趋势。</li>
+<li>数据调整：若排名无提升或JSON-LD解析失败，排查字段完整性、数据一致性、抓取权限等问题，针对性优化；若FAQ富摘要未展示，检查FAQPage字段格式、问答数量、内容相关性；根据业务变化（如认证、更新FAQ），及时更新JSON-LD及页面内容。</li>
+</ol>
+<h2 id="七核心运维规范含数据更新sitemap管理faq权威信息运维">七、核心运维规范（含数据更新、Sitemap管理，FAQ/权威信息运维）</h2>
+<h3 id="71-json-ld数据更新规范">7.1 JSON-LD数据更新规范</h3>
+<p>当商品信息、地理数据、FAQ内容、权威资质发生变更时，需同步更新对应页面的JSON-LD标签，避免数据不一致导致搜索引擎信任度下降，具体更新场景及流程如下：</p>
+<h4 id="711-核心更新场景">7.1.1 核心更新场景</h4>
+<ul>
+<li>商品地理属性变更：服务区域扩展/缩减、区域安装服务调整、工程案例所在区域更新，需同步修正对应页面Schema中的“areaServed”字段。</li>
+<li>页面信息变更：更新H1、元描述后，需同步调整Schema中的“name”“description”字段，确保一致性；商品SKU、名称变更需同步更新Product类型字段。</li>
+<li>运营信息变更：核心地址、电话、营业时间变更，需同步更新Organization类型Schema及所有关联页面的展示内容、商户平台信息。</li>
+<li>FAQ内容变更：用户高频问题更新、业务规则调整（如配送时效变化），需同步更新FAQPage中的Question/Answer字段，确保与页面展示的FAQ一致。</li>
+<li>权威资质变更：认证到期、认证/奖项、资质颁发机构信息变更，需同步更新certification/hasCredential字段，删除失效资质，有效资质。</li>
+</ul>
+<h4 id="712-标准化更新流程">7.1.2 标准化更新流程</h4>
+<ol>
+<li>后端同步更新：后端修改地理相关原始数据、FAQ问答库、权威资质库后，同步更新接口返回字段，确保字段名称、格式与原规范一致，字段需提前同步前端。</li>
+<li>前端标签更新：前端对接更新后的接口，重新渲染JSON-LD标签内容，重点核对一致性字段（如地址、经纬度、库存状态、FAQ问答、权威资质），避免拼写错误、格式偏差。</li>
+<li>验证环节：更新后通过谷歌Rich Results Test、百度结构化数据验证工具，逐项校验对应页面的JSON-LD有效性，重点验证FAQ、权威资质字段的解析状态，确认无解析错误。</li>
+<li>上线监控：页面上线后24-48小时内，在搜索控制台查看字段解析状态，确保更新后的数据正常被搜索引擎抓取；检查FAQ富摘要是否正常展示。</li>
+</ol>
+<h3 id="72-sitemap更新管理">7.2 Sitemap更新管理</h3>
+<p>Sitemap需随地理相关页面增减、内容更新、FAQ/权威信息变更同步维护，确保搜索引擎及时抓取新页面、更新旧页面索引，具体规范如下：</p>
+<h4 id="721-需更新sitemap的场景">7.2.1 需更新Sitemap的场景</h4>
+<ul>
+<li>页面：添加博客页、FAQ聚合页等新页面时，需同步添加至Sitemap，补充博客页/FAQ页Schema（关联WebSite及Organization ID），融入地理关键词；页面需标注lastmod为当前日期。</li>
+<li>页面变更：各页面H1、元描述、URL变更、FAQ、权威信息更新，需更新Sitemap中的URL及lastmod字段；页面删除需及时从Sitemap中移除，避免死链。</li>
+<li>定期更新：建议每周全量更新一次Sitemap，重点核对所有页面的有效性、FAQ/权威信息字段的准确性，每月排查URL是否可达，移除失效页面。</li>
+</ul>
+<h4 id="722-标准化更新流程">7.2.2 标准化更新流程</h4>
+<ol>
+<li>生成Sitemap：后端或运维通过工具（如Go语言sitemap-go库）自动生成包含所有地理相关页面、FAQ页、权威信息页的Sitemap，格式为XML，确保每个URL标注最后更新时间（lastmod字段）。</li>
+<li>提交更新：将生成的Sitemap提交至百度搜索资源平台、谷歌搜索控制台，百度支持手动提交或通过API批量提交，谷歌可关联站点自动更新；FAQ/权威信息更新的页面需单独标记，优先提交。</li>
+<li>索引监控：提交后1-3天内，在搜索控制台查看Sitemap状态，确认无错误（如URL不可达、格式错误），跟踪页面索引进度；查看FAQ/权威信息相关页面的索引状态。</li>
+</ol>
+<h4 id="723-注意事项">7.2.3 注意事项</h4>
+<p>Sitemap中仅包含可索引页面，禁止添加被robots禁止抓取、带noindex标签的页面；地理相关页面、FAQ页、权威信息页需单独分类标注（可按页面类型拆分Sitemap，如商品页、批发页、配送页、FAQ页），提升抓取优先级。</p>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>

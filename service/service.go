@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"demo01/model"
-	"demo01/repository"
+	"webdemo/model"
+	"webdemo/repository"
+
 	"fmt"
 )
 

@@ -1,10 +1,10 @@
 package db
 
 import (
-	"demo01/config"
 	"fmt"
 	"log"
 	"time"
+	"webdemo/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

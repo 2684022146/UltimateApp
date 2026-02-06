@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"demo01/model"
 	"errors"
 	"fmt"
 	"log"
+	"webdemo/model"
 
 	"gorm.io/gorm"
 )

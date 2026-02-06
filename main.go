@@ -1,11 +1,11 @@
 package main
 
 import (
-	"demo01/config"
-	"demo01/db"
-	"demo01/route"
 	"log"
 	"net/http"
+	"webdemo/config"
+	"webdemo/db"
+	"webdemo/route"
 
 	"github.com/gin-gonic/gin"
 )

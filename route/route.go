@@ -1,9 +1,9 @@
 package route
 
 import (
-	"demo01/controller"
-	"demo01/repository"
-	"demo01/service"
+	"webdemo/controller"
+	"webdemo/repository"
+	"webdemo/service"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -34,5 +34,10 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		productGroup.GET("/list", productController.GetProductList)
 		productGroup.GET("/detail", productController.ProductDetail)
 	}
+	loginRepo := repository.NewLoginRepository(db)
+	loginService := service.NewLoginService(loginRepo)
+	loginController := controller.NewLoginController(loginService)
+	r.POST("/login", loginController.Login)
+	r.POST("/regist", loginController.Regist)
 	return r
 }
