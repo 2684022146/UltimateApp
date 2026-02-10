@@ -28,6 +28,7 @@ func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
 	var req *model.CreateAddressRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, "参数错误")
+		return
 	}
 	c := ctx.Request.Context()
 	v, ok := userId_ctx.(int)

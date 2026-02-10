@@ -2,6 +2,7 @@ package route
 
 import (
 	"webdemo/controller"
+	"webdemo/middleware"
 	"webdemo/repository"
 	"webdemo/service"
 
@@ -26,26 +27,27 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		MaxAge: 86400,
 	}))
 
-	productRepo := repository.NewProductRepository(db)
-	productService := service.NewProductService(productRepo)
-	productController := controller.NewProductController(productService)
-	productGroup := r.Group("/product")
-	{
-		productGroup.GET("/list", productController.GetProductList)
-		productGroup.GET("/detail", productController.ProductDetail)
-	}
 	//登陆相关
 	loginRepo := repository.NewLoginRepository(db)
 	loginService := service.NewLoginService(loginRepo)
 	loginController := controller.NewLoginController(loginService)
 	r.POST("/login", loginController.Login)
 	r.POST("/regist", loginController.Regist)
+	//认证路由组
+	authGroup := r.Group("/api")
+	authGroup.Use(middleware.AuthMiddleware())
+	//地址管理路由
+	settingsRepo := repository.NewSettingsRepository(db)
+	settingsService := service.NewSettingsService(settingsRepo)
+	settingsController := controller.NewSettingsController(settingsService)
+	consigneeGroup := authGroup.Group("/settings")
+	consigneeGroup.Use(middleware.RequireConsignee())
+	{
+		//新建地址
+		consigneeGroup.POST("/address", settingsController.CreateAddress)
+		//地址列表
 
-	// // 地址管理路由
-	// settingRepo := repository.NewSettingsRepository(db)
-	// settingService := service.NewSettingsService(settingRepo)
-	// settingController := controller.NewSettingsController(settingService)
-
+	}
 	// // 认证路由组
 	// authGroup := r.Group("/api")
 	// authGroup.Use(middleware.AuthMiddleware())

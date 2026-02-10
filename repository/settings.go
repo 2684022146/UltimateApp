@@ -12,6 +12,7 @@ import (
 type SettingsRepository interface {
 	IsAddressExists(ctx context.Context, longitude, latitude float64, userId int) (bool, error)
 	CreateAddress(ctx context.Context, req *model.Address) error
+	AddressList(ctx context.Context, userID int) ([]*model.Address, error)
 }
 type settingsRepository struct {
 	db *gorm.DB
@@ -57,7 +58,14 @@ func (r *settingsRepository) CreateAddress(ctx context.Context, req *model.Addre
 	}
 	return nil
 }
-
+func (r *settingsRepository) AddressList(ctx context.Context, userId int) ([]*model.Address, error) {
+	var addresses = make([]*model.Address, 0, 10)
+	err := r.db.WithContext(ctx).Model(&model.Address{}).Where("user_id=?", userId).Scan(&addresses).Error
+	if err != nil {
+		return nil, errors.New("获取地址列表失败")
+	}
+	return addresses, nil
+}
 func (r *settingsRepository) IsAddressExists(ctx context.Context, longitude, latitude float64, userId int) (bool, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Address{}).Where("longitude=? AND latitude=? AND user_id=?", longitude, latitude, userId).Count(&count).Error

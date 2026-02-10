@@ -60,10 +60,24 @@ func (r *loginRepository) Regist(ctx context.Context, username, password string,
 		Password: hashedPassword,
 		RoleID:   roleId,
 	}
-
-	err = r.db.WithContext(ctx).Model(&model.User{}).Create(newUser).Error
+	var txErr error
+	tx := r.db.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			return
+		}
+		if txErr == nil {
+			if commitErr := tx.Commit(); commitErr != nil {
+				txErr = fmt.Errorf("提交事务失败")
+				return
+			}
+		}
+	}()
+	err = tx.WithContext(ctx).Model(&model.User{}).Create(newUser).Error
 	if err != nil {
-		return fmt.Errorf("create new user fail:%v", err)
+		txErr = fmt.Errorf("create new user fail:%v", err)
+		return txErr
 	}
-	return nil
+	return txErr
 }

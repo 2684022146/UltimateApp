@@ -140,6 +140,7 @@ CREATE TABLE `permissions` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_perm_code` (`perm_code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='权限表（接口/操作权限定义）';
+
 #### 5.1.4 role_permissions 表
 
 CREATE TABLE `role_permissions` (
