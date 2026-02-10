@@ -21,6 +21,8 @@ func AuthMiddleware() gin.HandlerFunc {
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			util.Fail(ctx, http.StatusUnauthorized, "Token格式错误")
+			ctx.Abort()
+			return
 		}
 		tokenString := parts[1]
 		claims := &util.CustomClaim{}
@@ -43,10 +45,43 @@ func AuthMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		ctx.Set("userId", claims.ID)
+		ctx.Set("user_id", claims.ID)
 		ctx.Set("username", claims.Username)
 		ctx.Set("role_id", claims.RoleID)
+		ctx.Set("token", tokenString)
 		ctx.Next()
 	}
 
+}
+func RequireRole(roleId int8) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authMiddleware := AuthMiddleware()
+		authMiddleware(ctx)
+		if ctx.IsAborted() {
+			return
+		}
+		//验证角色
+		userRole, exists := ctx.Get("role_id")
+		if !exists {
+			util.Fail(ctx, http.StatusUnauthorized, "获取角色失败")
+			ctx.Abort()
+			return
+		}
+		if userRole.(int8) != roleId {
+			util.Fail(ctx, http.StatusForbidden, "权限不足")
+			ctx.Abort()
+			return
+		}
+		ctx.Next()
+	}
+}
+
+// RequireConsignee 收货人角色验证中间件
+func RequireConsignee() gin.HandlerFunc {
+	return RequireRole(0)
+}
+
+// RequireDeliveryman 配送员角色验证中间件
+func RequireDeliveryman() gin.HandlerFunc {
+	return RequireRole(1)
 }

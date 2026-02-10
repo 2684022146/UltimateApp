@@ -34,10 +34,37 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		productGroup.GET("/list", productController.GetProductList)
 		productGroup.GET("/detail", productController.ProductDetail)
 	}
+	//登陆相关
 	loginRepo := repository.NewLoginRepository(db)
 	loginService := service.NewLoginService(loginRepo)
 	loginController := controller.NewLoginController(loginService)
 	r.POST("/login", loginController.Login)
 	r.POST("/regist", loginController.Regist)
+
+	// // 地址管理路由
+	// settingRepo := repository.NewSettingsRepository(db)
+	// settingService := service.NewSettingsService(settingRepo)
+	// settingController := controller.NewSettingsController(settingService)
+
+	// // 认证路由组
+	// authGroup := r.Group("/api")
+	// authGroup.Use(middleware.AuthMiddleware())
+	// {
+	// 	// 退出登录（所有认证用户可访问）
+	// 	authGroup.POST("/logout", settingController.Logout) // 退出登录
+
+	// 	// 地址管理（仅收货人可访问）
+	// 	consigneeGroup := authGroup.Group("/settings")
+	// 	consigneeGroup.Use(middleware.RequireConsignee())
+	// 	{
+	// 		consigneeGroup.POST("/address", settingController.CreateAddress)                // 创建地址
+	// 		consigneeGroup.PUT("/address", settingController.UpdateAddress)                 // 更新地址
+	// 		consigneeGroup.DELETE("/address", settingController.DeleteAddress)              // 删除地址
+	// 		consigneeGroup.GET("/address/:id", settingController.GetAddressByID)            // 获取地址详情
+	// 		consigneeGroup.GET("/addresses", settingController.GetAddressList)              // 获取地址列表
+	// 		consigneeGroup.PUT("/address/:id/default", settingController.SetDefaultAddress) // 设置默认地址
+	// 	}
+	// }
+
 	return r
 }

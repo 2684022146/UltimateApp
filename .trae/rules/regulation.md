@@ -1,0 +1,10 @@
+不要直接在文件里给我代码
+本项目的主要内容是实时物流追踪app的后端服务，主要的功能有用户注册登录、物流信息查询、物流信息更新、物流信息删除等。
+项目基于Gin框架，采用RESTful API设计，数据库框架为Gorm，数据库采用MySQL。
+项目采用分层架构，包括Controller、Service、Repository、model层，每个层都有其特定的职责。
+项目的Controller层负责处理HTTP请求和响应，调用Service层的方法来处理业务逻辑。
+Service层负责实现业务逻辑，调用Repository层的方法来访问数据库。
+Repository层负责与数据库交互，执行CRUD操作。
+model层定义了数据库中的表结构。
+本项目的目的是在开发的过程中学习企业级标准，代码需标准且简洁。
+
