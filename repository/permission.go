@@ -22,7 +22,7 @@ func NewPermissionRepository(db *gorm.DB) PermissionRepository {
 }
 func (r *permissionRepository) GetPermissionsByRoleID(roleId int8) ([]*model.Permission, error) {
 	var permissions []*model.Permission
-	err := r.db.Table("permissions").Joins("JOIN role_permissions ON permissions.id=role_permissions.perm_id").Where("role_permissions.role_id=?", roleId).Find(&permissions).Error
+	err := r.db.Model(&model.Permission{}).Joins("JOIN role_permissions ON permissions.id=role_permissions.perm_id").Where("role_permissions.role_id=?", roleId).Find(&permissions).Error
 	if err != nil {
 		return nil, errors.New("获取权限列表失败")
 	}
