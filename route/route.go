@@ -41,7 +41,7 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 	settingsService := service.NewSettingsService(settingsRepo)
 	settingsController := controller.NewSettingsController(settingsService)
 	consigneeGroup := authGroup.Group("/settings")
-	consigneeGroup.Use(middleware.RequireConsignee())
+	consigneeGroup.Use(middleware.RequireRole())
 	{
 		//新建地址
 		consigneeGroup.POST("/address", settingsController.CreateAddress)

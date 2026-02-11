@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"webdemo/repository"
 )
 
@@ -20,18 +21,23 @@ func NewPermissionService(repo repository.PermissionRepository) PermissionServic
 		repo:          repo,
 		permissionMap: make(map[int8]map[string]map[string]bool),
 	}
-	s.RefreshPermissions()
+	if err := s.RefreshPermissions(); err != nil {
+		log.Println("refresh 方法")
+		return nil
+	}
+
 	return s
 }
 
 // 校验角色权限 在map里每层查找 O(1)
 func (s *permissionService) CheckPermission(roleId int8, apiPath, method string) bool {
+
 	methodMap, roleIdExists := s.permissionMap[roleId]
 	if !roleIdExists {
 		return false
 	}
-	apiPathMap, mothodExists := methodMap[method]
-	if !mothodExists {
+	apiPathMap, methodExists := methodMap[method]
+	if !methodExists {
 		return false
 	}
 	_, apiPathExists := apiPathMap[apiPath]
@@ -41,6 +47,7 @@ func (s *permissionService) CheckPermission(roleId int8, apiPath, method string)
 
 // 将repo获取到的角色-权限切片放入map里 每次启动只调用一次
 func (s *permissionService) RefreshPermissions() error {
+	log.Println("进入refresh 方法")
 	s.permissionMap = make(map[int8]map[string]map[string]bool)
 	roles, err := s.repo.GetRoles()
 	if err != nil {
@@ -48,6 +55,8 @@ func (s *permissionService) RefreshPermissions() error {
 	}
 	for _, role := range roles {
 		permissions, err := s.repo.GetPermissionsByRoleID(role)
+		log.Println("permissions", permissions)
+
 		if err != nil {
 			return fmt.Errorf("%s", err)
 		}

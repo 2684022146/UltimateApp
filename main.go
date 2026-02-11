@@ -5,7 +5,10 @@ import (
 	"net/http"
 	"webdemo/config"
 	"webdemo/db"
+	"webdemo/middleware"
+	"webdemo/repository"
 	"webdemo/route"
+	"webdemo/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +18,9 @@ func main() {
 	dbConn, _ := db.InitMySQL(cfg.Mysql)
 	log.Println("MySQL初始化成功")
 	gin.SetMode(cfg.Server.Mode)
+	permRepo := repository.NewPermissionRepository(dbConn)
+	permService := service.NewPermissionService(permRepo)
+	middleware.SetPermissionService(permService)
 	r := route.InitRouter(dbConn)
 	server := &http.Server{
 		Addr:    ":" + cfg.Server.Port,

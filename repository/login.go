@@ -11,7 +11,7 @@ import (
 )
 
 type LoginRepository interface {
-	Login(ctx context.Context, username, password string) (*model.User, error)
+	Login(ctx context.Context, username, password string, roleId int8) (*model.User, error)
 	Regist(ctx context.Context, username, password string, roleId int8) error
 }
 type loginRepository struct {
@@ -23,14 +23,14 @@ func NewLoginRepository(db *gorm.DB) LoginRepository {
 		db: *db,
 	}
 }
-func (r *loginRepository) Login(ctx context.Context, username, password string) (*model.User, error) {
+func (r *loginRepository) Login(ctx context.Context, username, password string, roleId int8) (*model.User, error) {
 	if username == "" || password == "" {
 		return nil, fmt.Errorf("用户名和密码不能为空")
 	}
 
 	hashedPassword := util.Md5String(password)
 	var user *model.User
-	err := r.db.WithContext(ctx).Table("users").Where("username=? AND password=?", username, hashedPassword).Take(&user).Error
+	err := r.db.WithContext(ctx).Table("users").Where("username=? AND password=? AND role_id=?", username, hashedPassword, roleId).Take(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("username or password error")

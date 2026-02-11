@@ -2,14 +2,25 @@ package middleware
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
+	"webdemo/service"
 	"webdemo/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var (
+	//全局服务权限实例
+	permissionService service.PermissionService
+)
+
+// 设置权限服务实例
+func SetPermissionService(ps service.PermissionService) {
+	permissionService = ps
+}
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
@@ -53,35 +64,28 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 
 }
-func RequireRole(roleId int8) gin.HandlerFunc {
+
+// 角色权限校验中间件
+func RequireRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authMiddleware := AuthMiddleware()
-		authMiddleware(ctx)
-		if ctx.IsAborted() {
-			return
-		}
-		//验证角色
-		userRole, exists := ctx.Get("role_id")
+		//获取当前角色
+		roleId, exists := ctx.Get("role_id")
 		if !exists {
 			util.Fail(ctx, http.StatusUnauthorized, "获取角色失败")
 			ctx.Abort()
 			return
 		}
-		if userRole.(int8) != roleId {
-			util.Fail(ctx, http.StatusForbidden, "权限不足")
+		//获取当前请求api
+		method := ctx.Request.Method
+		apiPath := ctx.Request.URL.Path
+		//角色权限校验
+		hasPermission := permissionService.CheckPermission(roleId.(int8), apiPath, method)
+		if !hasPermission {
+			log.Println("hasPermission", hasPermission)
+			util.Fail(ctx, http.StatusUnauthorized, "权限不足")
 			ctx.Abort()
 			return
 		}
 		ctx.Next()
 	}
-}
-
-// RequireConsignee 收货人角色验证中间件
-func RequireConsignee() gin.HandlerFunc {
-	return RequireRole(0)
-}
-
-// RequireDeliveryman 配送员角色验证中间件
-func RequireDeliveryman() gin.HandlerFunc {
-	return RequireRole(1)
 }

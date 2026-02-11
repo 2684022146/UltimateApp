@@ -26,7 +26,7 @@ func (s *loginService) Login(ctx context.Context, req *model.LoginRequest) (stri
 	if req.Username == "" || req.Password == "" {
 		return "", fmt.Errorf("username and password not empty")
 	}
-	user, err := s.repo.Login(ctx, req.Username, req.Password)
+	user, err := s.repo.Login(ctx, req.Username, req.Password, req.RoleID)
 	if err != nil {
 		return "", fmt.Errorf("%v", err)
 	}
