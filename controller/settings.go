@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"webdemo/model"
 	"webdemo/service"
@@ -21,7 +22,6 @@ func NewSettingsController(settingsService service.SettingsService) *SettingsCon
 }
 func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
 	userId_ctx, exist := ctx.Get("user_id")
-	var userId int
 	if !exist {
 		util.Fail(ctx, http.StatusUnauthorized, "请重新登录")
 	}
@@ -30,14 +30,28 @@ func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
 		util.Fail(ctx, http.StatusBadRequest, "参数错误")
 		return
 	}
+	userId := userId_ctx.(uint)
 	c := ctx.Request.Context()
-	v, ok := userId_ctx.(int)
-	if ok {
-		userId = v
-	}
 	if err := controller.settingsService.CreateAddress(c, req, userId); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, fmt.Sprintf("%s", err))
 		return
 	}
 	util.Success(ctx, "success")
+}
+func (controller *SettingsController) AddressList(ctx *gin.Context) {
+	userId_ctx, exists := ctx.Get("user_id")
+	if !exists {
+		util.Fail(ctx, http.StatusUnauthorized, "请重新登陆")
+		return
+	}
+	userId := userId_ctx.(uint)
+	c := ctx.Request.Context()
+	addressSlice, err := controller.settingsService.AddressList(c, userId)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "获取地址列表失败")
+		return
+	}
+	log.Println(addressSlice)
+	util.Success(ctx, addressSlice)
+
 }

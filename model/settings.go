@@ -3,7 +3,7 @@ package model
 // Address 收货地址结构体
 type Address struct {
 	ID        uint    `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
-	UserID    int     `gorm:"column:user_id" json:"user_id"`
+	UserID    uint    `gorm:"column:user_id" json:"user_id"`
 	Province  string  `gorm:"column:province" json:"province"`
 	City      string  `gorm:"column:city" json:"city"`
 	District  string  `gorm:"column:district" json:"district"`

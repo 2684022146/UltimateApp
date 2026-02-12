@@ -46,6 +46,7 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		//新建地址
 		consigneeGroup.POST("/address", settingsController.CreateAddress)
 		//地址列表
+		consigneeGroup.GET("/address/list", settingsController.AddressList)
 
 	}
 	// // 认证路由组

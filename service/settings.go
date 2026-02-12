@@ -8,7 +8,8 @@ import (
 )
 
 type SettingsService interface {
-	CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId int) error
+	CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId uint) error
+	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
 }
 type settingsService struct {
 	repo repository.SettingsRepository
@@ -19,7 +20,7 @@ func NewSettingsService(repo repository.SettingsRepository) SettingsService {
 		repo: repo,
 	}
 }
-func (s *settingsService) CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId int) error {
+func (s *settingsService) CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId uint) error {
 	address := &model.Address{
 		UserID:    userId,
 		Province:  req.Province,
@@ -38,4 +39,11 @@ func (s *settingsService) CreateAddress(ctx context.Context, req *model.CreateAd
 		return fmt.Errorf("创建新地址失败:%w", err)
 	}
 	return nil
+}
+func (s *settingsService) AddressList(ctx context.Context, userId uint) ([]*model.Address, error) {
+	addressSlice, err := s.repo.AddressList(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("%s", err)
+	}
+	return addressSlice, nil
 }
