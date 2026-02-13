@@ -55,3 +55,18 @@ func (controller *SettingsController) AddressList(ctx *gin.Context) {
 	util.Success(ctx, addressSlice)
 
 }
+func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
+	var req *model.Address
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "参数错误")
+		return
+	}
+	log.Println(req.IsDefault)
+	c := ctx.Request.Context()
+	if err := controller.settingsService.UpdateAddress(c, req); err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "修改地址失败")
+		return
+	}
+	util.Success(ctx, "success")
+}

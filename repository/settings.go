@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"webdemo/model"
 
@@ -11,9 +10,10 @@ import (
 )
 
 type SettingsRepository interface {
-	IsAddressExists(ctx context.Context, longitude, latitude float64, userId uint) (bool, error)
 	CreateAddress(ctx context.Context, req *model.Address) error
 	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
+	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
+	UpdateAddress(ctx context.Context, req *model.Address) error
 }
 type settingsRepository struct {
 	db *gorm.DB
@@ -46,27 +46,21 @@ func (r *settingsRepository) CreateAddress(ctx context.Context, req *model.Addre
 			}
 		}
 	}()
-	exists, err := r.IsAddressExists(ctx, req.Longitude, req.Latitude, req.UserID)
-	if err != nil {
-		return err
-	}
-	if exists {
-		return errors.New("已存在相同地址")
-	} else {
-		if req.IsDefault == 1 {
-			if err := tx.Model(&model.Address{}).Where("user_id=?", req.UserID).Update("is_default", 0).Error; err != nil {
-				tx.Rollback()
-				txErr = errors.New("更新默认地址失败")
-				return txErr
-			}
-		}
-		log.Println("after update is_default", req.IsDefault)
-		if err := tx.Create(req).Error; err != nil {
+
+	if req.IsDefault == 1 {
+		if err := tx.Model(&model.Address{}).Where("user_id=?", req.UserID).Update("is_default", 0).Error; err != nil {
 			tx.Rollback()
-			txErr = errors.New("新建地址失败")
+			txErr = errors.New("更新默认地址失败")
 			return txErr
 		}
 	}
+	log.Println("after update is_default", req.IsDefault)
+	if err := tx.Create(req).Error; err != nil {
+		tx.Rollback()
+		txErr = errors.New("新建地址失败")
+		return txErr
+	}
+
 	return txErr
 }
 
@@ -79,11 +73,40 @@ func (r *settingsRepository) AddressList(ctx context.Context, userId uint) ([]*m
 
 	return addresses, nil
 }
-func (r *settingsRepository) IsAddressExists(ctx context.Context, longitude, latitude float64, userId uint) (bool, error) {
-	var count int64
-	err := r.db.WithContext(ctx).Model(&model.Address{}).Where("longitude=? AND latitude=? AND user_id=?", longitude, latitude, userId).Count(&count).Error
+func (r *settingsRepository) AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error) {
+	var address *model.Address
+	err := r.db.Model(&model.Address{}).Where("id=? AND user_id=?", addressId, userId).Take(address).Error
 	if err != nil {
-		return false, fmt.Errorf("查询地址失败")
+		return nil, errors.New("获取地址详情失败")
 	}
-	return count > 0, nil
+	return address, nil
+}
+func (r *settingsRepository) UpdateAddress(ctx context.Context, req *model.Address) error {
+	tx := r.db.WithContext(ctx).Begin()
+	var txErr error
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			return
+		}
+		if txErr == nil {
+			if commitErr := tx.Commit(); commitErr != nil {
+				tx.Rollback()
+				return
+			}
+		}
+	}()
+	if req.IsDefault == 1 {
+		err := tx.Model(&model.Address{}).Where("user_id=?", req.UserID).Update("is_default", 0).Error
+		if err != nil {
+			txErr = errors.New("更新默认地址失败")
+			return txErr
+		}
+	}
+	err := tx.Model(&model.Address{}).Where("id=? AND user_id=?", req.ID, req.UserID).Select("*").Updates(req).Error
+	if err != nil {
+		txErr = errors.New("更新地址失败")
+		return txErr
+	}
+	return txErr
 }

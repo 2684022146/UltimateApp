@@ -176,7 +176,7 @@ CREATE TABLE `orders` (
 
 CREATE TABLE `addresses` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '地址唯一ID（自增，无符号避免负数）',
-  `user_id` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '归属用户ID（收货人ID，关联用户表user_id）',
+  `user_id` int unsigned NOT NULL NOT NULL COMMENT '归属用户ID（收货人ID，关联用户表user_id）',
   `province` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '省份（如：北京市）',
   `city` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '市（如：北京市）',
   `district` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '区/县（允许为空，如：朝阳区）',

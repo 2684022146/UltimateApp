@@ -10,6 +10,8 @@ import (
 type SettingsService interface {
 	CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId uint) error
 	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
+	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
+	UpdateAddress(ctx context.Context, req *model.Address) error
 }
 type settingsService struct {
 	repo repository.SettingsRepository
@@ -46,4 +48,13 @@ func (s *settingsService) AddressList(ctx context.Context, userId uint) ([]*mode
 		return nil, fmt.Errorf("%s", err)
 	}
 	return addressSlice, nil
+}
+func (s *settingsService) AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error) {
+	return s.repo.AddressDetail(ctx, addressId, userId)
+}
+func (s *settingsService) UpdateAddress(ctx context.Context, req *model.Address) error {
+	if err := s.repo.UpdateAddress(ctx, req); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+	return nil
 }
