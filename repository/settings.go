@@ -14,6 +14,7 @@ type SettingsRepository interface {
 	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
 	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
 	UpdateAddress(ctx context.Context, req *model.Address) error
+	DeleteAddress(ctx context.Context, addressId, userId uint) error
 }
 type settingsRepository struct {
 	db *gorm.DB
@@ -74,10 +75,12 @@ func (r *settingsRepository) AddressList(ctx context.Context, userId uint) ([]*m
 	return addresses, nil
 }
 func (r *settingsRepository) AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error) {
-	var address *model.Address
+	var address = &model.Address{}
 	err := r.db.Model(&model.Address{}).Where("id=? AND user_id=?", addressId, userId).Take(address).Error
 	if err != nil {
+		log.Println(err)
 		return nil, errors.New("获取地址详情失败")
+
 	}
 	return address, nil
 }
@@ -109,4 +112,13 @@ func (r *settingsRepository) UpdateAddress(ctx context.Context, req *model.Addre
 		return txErr
 	}
 	return txErr
+}
+func (r *settingsRepository) DeleteAddress(ctx context.Context, addressId, userId uint) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Delete(&model.Address{}, "id=? AND user_id=?", addressId, userId).Error
+		if err != nil {
+			return errors.New("删除地址失败")
+		}
+		return nil
+	})
 }

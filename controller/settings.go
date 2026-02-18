@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"webdemo/consts"
 	"webdemo/model"
 	"webdemo/service"
 	"webdemo/util"
@@ -36,7 +38,7 @@ func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
 		util.Fail(ctx, http.StatusBadRequest, fmt.Sprintf("%s", err))
 		return
 	}
-	util.Success(ctx, "success")
+	util.Success(ctx, nil)
 }
 func (controller *SettingsController) AddressList(ctx *gin.Context) {
 	userId_ctx, exists := ctx.Get("user_id")
@@ -55,6 +57,32 @@ func (controller *SettingsController) AddressList(ctx *gin.Context) {
 	util.Success(ctx, addressSlice)
 
 }
+func (controller *SettingsController) AddressDetail(ctx *gin.Context) {
+	userId_ctx, exists := ctx.Get("user_id")
+	if !exists {
+		util.Fail(ctx, http.StatusUnauthorized, "请重新登录")
+		return
+	}
+	userId := userId_ctx.(uint)
+	addressIdStr := ctx.Query("address_id")
+	if addressIdStr == "" {
+		util.Fail(ctx, http.StatusBadRequest, consts.ParmFalse)
+		return
+	}
+	addressId, err := strconv.ParseUint(addressIdStr, 10, 64)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, consts.TransformFalse)
+		return
+	}
+	c := ctx.Request.Context()
+	addressInfo, err := controller.settingsService.AddressDetail(c, uint(addressId), userId)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "获取地址详情失败")
+		log.Println(err)
+		return
+	}
+	util.Success(ctx, addressInfo)
+}
 func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
 	var req *model.Address
 
@@ -69,4 +97,27 @@ func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
 		return
 	}
 	util.Success(ctx, "success")
+}
+func (controller *SettingsController) DeleteAddress(ctx *gin.Context) {
+	userId_ctx, exists := ctx.Get("user_id")
+	if !exists {
+		util.Fail(ctx, http.StatusUnauthorized, "请重新登陆")
+		return
+	}
+	userId := userId_ctx.(uint)
+	addressIdStr := ctx.Query("address_id")
+	addressId, err := strconv.ParseUint(addressIdStr, 10, 64)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, consts.TransformFalse)
+		log.Println(err, "addressIdStr", addressIdStr)
+		return
+	}
+	c := ctx.Request.Context()
+	err = controller.settingsService.DeleteAddress(c, uint(addressId), userId)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "删除地址失败")
+		return
+	}
+	util.Success(ctx, nil)
+
 }
