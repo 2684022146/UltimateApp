@@ -53,6 +53,8 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		consigneeGroup.GET("/address", settingsController.AddressDetail)
 		//删除地址
 		consigneeGroup.DELETE("/address", settingsController.DeleteAddress)
+		//设为默认地址
+		consigneeGroup.PUT("/address/default", settingsController.SetDefault)
 
 	}
 	// // 认证路由组

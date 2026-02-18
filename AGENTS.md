@@ -27,11 +27,11 @@
 | 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
 |------|------|----------|---------------|-------------------|
 Get|/api/settings/address/list|地址列表
-Get|/api/settings/address/:id|地址详情
+Get|/api/settings/address地址详情
 Post|/api/settings/address/create|新建地址
 Put|/api/seetings/address|修改地址
 Delete|/api/settings/address|删除地址
-Put|/api/settings/address/:id/default|设置默认地址
+Put|/api/settings/address/default|设置默认地址
 Post|/api/settings/logout|退出登陆
 
 ### 2.3 任务管理接口

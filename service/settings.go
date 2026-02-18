@@ -13,6 +13,7 @@ type SettingsService interface {
 	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
 	UpdateAddress(ctx context.Context, req *model.Address) error
 	DeleteAddress(ctx context.Context, addressId, userId uint) error
+	SetDefault(ctx context.Context, addressId, userId uint) error
 }
 type settingsService struct {
 	repo repository.SettingsRepository
@@ -65,4 +66,11 @@ func (s *settingsService) DeleteAddress(ctx context.Context, addressId, userId u
 		return fmt.Errorf("%s", err)
 	}
 	return err
+}
+func (s *settingsService) SetDefault(ctx context.Context, addressId, userId uint) error {
+	err := s.repo.SetDefault(ctx, addressId, userId)
+	if err != nil {
+		return fmt.Errorf("%s", err)
+	}
+	return nil
 }

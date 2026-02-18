@@ -119,5 +119,26 @@ func (controller *SettingsController) DeleteAddress(ctx *gin.Context) {
 		return
 	}
 	util.Success(ctx, nil)
-
+}
+func (controller *SettingsController) SetDefault(ctx *gin.Context) {
+	userId_ctx, exists := ctx.Get("user_id")
+	if !exists {
+		util.Fail(ctx, http.StatusUnauthorized, consts.ReSignIn)
+		return
+	}
+	userId := userId_ctx.(uint)
+	addressIdStr := ctx.Query("address_id")
+	addressId, err := strconv.ParseUint(addressIdStr, 10, 64)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, consts.TransformFalse)
+		log.Println(err, "addressIdStr", addressIdStr)
+		return
+	}
+	c := ctx.Request.Context()
+	err = controller.settingsService.SetDefault(c, uint(addressId), userId)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "设为默认地址失败")
+		return
+	}
+	util.Success(ctx, nil)
 }

@@ -15,6 +15,7 @@ type SettingsRepository interface {
 	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
 	UpdateAddress(ctx context.Context, req *model.Address) error
 	DeleteAddress(ctx context.Context, addressId, userId uint) error
+	SetDefault(ctx context.Context, addressId, userId uint) error
 }
 type settingsRepository struct {
 	db *gorm.DB
@@ -118,6 +119,19 @@ func (r *settingsRepository) DeleteAddress(ctx context.Context, addressId, userI
 		err := tx.Delete(&model.Address{}, "id=? AND user_id=?", addressId, userId).Error
 		if err != nil {
 			return errors.New("删除地址失败")
+		}
+		return nil
+	})
+}
+func (r *settingsRepository) SetDefault(ctx context.Context, addressId, userId uint) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&model.Address{}).Where("user_id=?", userId).Update("is_default", 0).Error
+		if err != nil {
+			return errors.New("更新默认地址失败")
+		}
+		err = tx.Model(&model.Address{}).Where("id=? AND user_id=?", addressId, userId).Update("is_default", 1).Error
+		if err != nil {
+			return errors.New("设为默认地址失败")
 		}
 		return nil
 	})
