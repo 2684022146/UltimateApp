@@ -1,10 +1,10 @@
 # Agents 模块设计
 
 ## 1. 概念定义
-
+主要的业务内容是用户新建订单填好物品信息、选择地址和指定配送员，数据库的orders表加入这条数据。配送员端通过可以查看到配送员是自己的订单，通过开启所选的订单的配送任务将订单的状态改为配送中(2),并将数据加入到delivery_assign表。通过开启goroutine用websocket和map使一个配送员可对应多个用户，并实时将自己的位置信息上传至location_traces表，用户查看订单详情可以显示配送的路径和配送员的实时位置。订单详情显示配送的信息，包括位置信息，位置长时间不动上报异常。配送员送达后将订单状态改为已完成(3)。
 ### 1.1 Agent 角色定义
-- **配送员**：直接执行物流任务的人员，负责从取件到送达的全流程操作
-- **收货人**：收货人
+- **配送员**：直接执行物流任务的人员，负责从取件到送达的全流程操作 role_id=2
+- **用户/收货人**：收货人 role_id=1
 
 ### 1.2 核心术语
 - **任务**：需要配送员执行的物流订单
@@ -164,7 +164,9 @@ CREATE TABLE `orders` (
   `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '订单状态：1-待配送 / 2-配送中 / 3-已完成 / 4-已取消',
   `goods_info` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '货物信息（如：生鲜食品 2件）',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建时间（自动填充）',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间（自动更新）',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+   `delivery_user_id` int NOT NULL COMMENT '配送员ID',
+  COMMENT '订单更新时间（自动更新）',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_order_no` (`order_no`) USING BTREE,
   KEY `idx_user_id` (`user_id`) USING BTREE,

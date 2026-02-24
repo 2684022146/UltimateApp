@@ -57,25 +57,33 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 		consigneeGroup.PUT("/address/default", settingsController.SetDefault)
 
 	}
-	// // 认证路由组
-	// authGroup := r.Group("/api")
-	// authGroup.Use(middleware.AuthMiddleware())
-	// {
-	// 	// 退出登录（所有认证用户可访问）
-	// 	authGroup.POST("/logout", settingController.Logout) // 退出登录
+	//订单管理路由
+	ordersRepo := repository.NewOrdersRepository(db)
+	ordersService := service.NewOrdersService(ordersRepo)
+	ordersController := controller.NewOrdersController(ordersService)
 
-	// 	// 地址管理（仅收货人可访问）
-	// 	consigneeGroup := authGroup.Group("/settings")
-	// 	consigneeGroup.Use(middleware.RequireConsignee())
-	// 	{
-	// 		consigneeGroup.POST("/address", settingController.CreateAddress)                // 创建地址
-	// 		consigneeGroup.PUT("/address", settingController.UpdateAddress)                 // 更新地址
-	// 		consigneeGroup.DELETE("/address", settingController.DeleteAddress)              // 删除地址
-	// 		consigneeGroup.GET("/address/:id", settingController.GetAddressByID)            // 获取地址详情
-	// 		consigneeGroup.GET("/addresses", settingController.GetAddressList)              // 获取地址列表
-	// 		consigneeGroup.PUT("/address/:id/default", settingController.SetDefaultAddress) // 设置默认地址
-	// 	}
-	// }
+	// 收货人订单路由组
+	consigneeOrdersGroup := authGroup.Group("/orders")
+	consigneeOrdersGroup.Use(middleware.RequireRole())
+	{
+		//订单列表
+		consigneeOrdersGroup.GET("/list", ordersController.OrderList)
+		//创建订单
+		consigneeOrdersGroup.POST("/create", ordersController.CreateOrder)
+	}
+
+	// 配送员订单路由
+	deliveryOrdersRepo := repository.NewDeliveryOrdersRepository(db)
+	deliveryOrdersService := service.NewDeliveryOrdersService(deliveryOrdersRepo)
+	deliveryOrdersController := controller.NewDeliveryOrdersController(deliveryOrdersService)
+
+	// 配送员订单路由组
+	deliveryOrdersGroup := authGroup.Group("/delivery/orders")
+	deliveryOrdersGroup.Use(middleware.RequireRole())
+	{
+		//配送员待配送订单列表
+		deliveryOrdersGroup.GET("/list", deliveryOrdersController.DeliveryOrderList)
+	}
 
 	return r
 }
