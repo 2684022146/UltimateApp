@@ -11,6 +11,7 @@ import (
 
 type DeliveryOrdersRepository interface {
 	DeliveryOrderList(ctx context.Context, deliveryUserId uint) ([]*model.OrderResponse, error)
+	//DeliveryStartTask(ctx context.Context,)
 }
 
 type deliveryOrdersRepository struct {
@@ -75,3 +76,4 @@ func (r *deliveryOrdersRepository) DeliveryOrderList(ctx context.Context, delive
 
 	return orderResponses, nil
 }
+
