@@ -12,7 +12,7 @@ import (
 
 type LoginRepository interface {
 	Login(ctx context.Context, username, password string, roleId int8) (*model.User, error)
-	Regist(ctx context.Context, username, password string, roleId int8) error
+	Regist(ctx context.Context, username, password string, phone string, roleId int8) error
 }
 type loginRepository struct {
 	db gorm.DB
@@ -39,13 +39,17 @@ func (r *loginRepository) Login(ctx context.Context, username, password string, 
 	}
 	return user, nil
 }
-func (r *loginRepository) Regist(ctx context.Context, username, password string, roleId int8) error {
+func (r *loginRepository) Regist(ctx context.Context, username, password string, phone string, roleId int8) error {
 	if username == "" || password == "" {
 		return fmt.Errorf("用户名和密码不能为空")
 	}
 	if len(password) < 6 || len(password) > 8 {
 		return fmt.Errorf("密码长度在6位到8位间")
 	}
+	if len(phone) != 11 {
+		return fmt.Errorf("手机号错误")
+	}
+
 	var isDuplicate bool
 	err := r.db.WithContext(ctx).Model(&model.User{}).Where("username=? AND role_id=?", username, roleId).Select("1").Limit(1).Scan(&isDuplicate).Error
 	if err != nil {
@@ -58,6 +62,7 @@ func (r *loginRepository) Regist(ctx context.Context, username, password string,
 	newUser := &model.User{
 		Username: username,
 		Password: hashedPassword,
+		Phone:    phone,
 		RoleID:   roleId,
 	}
 	var txErr error

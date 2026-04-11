@@ -39,7 +39,7 @@ func (controller *LoginController) Login(ctx *gin.Context) {
 	})
 }
 func (controller *LoginController) Regist(ctx *gin.Context) {
-	var req model.LoginRequest
+	var req model.RegisterRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, err.Error())
 		return

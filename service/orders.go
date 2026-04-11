@@ -2,44 +2,50 @@ package service
 
 import (
 	"context"
-
+	"fmt"
 	"time"
+
 	"webdemo/model"
 	"webdemo/repository"
 	"webdemo/util"
 )
 
 type OrderService interface {
-	CreateOrder(ctx context.Context, order *model.Order) error
+	CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error
 }
 type orderService struct {
 	repo repository.OrdersRepository
 }
 
-func NewOrderService(repo repository.OrdersRepository) OrderService {
+func NewOrdersService(repo repository.OrdersRepository) OrderService {
 	return &orderService{
 		repo: repo,
 	}
 }
-func (s *orderService) CreateOrder(ctx context.Context, order *model.Order) error {
-	// 设置默认值
-	if order.Status == 0 {
-		order.Status = 1 // 默认状态为待配送
+func (s *orderService) CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error {
+	orderId := util.GenerateOrderNo()
+	orderDetail := &model.Order{
+		SenderUserID:      userId,
+		SenderAddressID:   req.SenderAddressID,
+		DeliveryUserID:    req.DeliveryUserID,
+		OrderNo:           orderId,
+		Status:            1, // 待接单状态
+		GoodsInfo:         req.GoodsInfo,
+		ReceiverName:      req.ReceiverName,
+		ReceiverPhone:     req.ReceiverPhone,
+		ReceiverProvince:  req.ReceiverProvince,
+		ReceiverCity:      req.ReceiverCity,
+		ReceiverDistrict:  req.ReceiverDistrict,
+		ReceiverStreet:    req.ReceiverStreet,
+		ReceiverDetail:    req.ReceiverDetail,
+		ReceiverLatitude:  req.ReceiverLatitude,
+		ReceiverLongitude: req.ReceiverLongitude,
+		CreateTime:        time.Now(),
+		UpdateTime:        time.Now(),
 	}
 
-	// 设置时间字段
-	now := time.Now().Format("2006-01-02 15:04:05")
-	if order.CreateTime == "" {
-		order.CreateTime = now
+	if err := s.repo.CreateOrder(ctx, orderDetail); err != nil {
+		return fmt.Errorf("创建新订单失败:%w", err)
 	}
-	if order.UpdateTime == "" {
-		order.UpdateTime = now
-	}
-
-	// 生成订单号
-	if order.OrderNo == "" {
-		order.OrderNo = util.GenerateOrderNo()
-	}
-
-	return s.repo.CreateOrder(ctx, order)
+	return nil
 }

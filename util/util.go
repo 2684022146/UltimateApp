@@ -15,7 +15,6 @@ const JwtSecret = "abcd-efgh-ijkl-mnop"
 // 雪花算法参数
 const (
 	workerIDBits  = 10
-	timestampBits = 41
 	sequenceBits  = 12
 	maxWorkerID   = -1 ^ (-1 << workerIDBits)
 	maxSequence   = -1 ^ (-1 << sequenceBits)

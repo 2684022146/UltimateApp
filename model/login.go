@@ -5,6 +5,12 @@ type LoginRequest struct {
 	Password string `json:"password"`
 	RoleID   int8   `json:"role_id"`
 }
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	RoleID   int8   `json:"role_id"`
+	Phone    string `json:"phone"`
+}
 type User struct {
 	Username string `gorm:"column:username" json:"username"`
 	Password string `gorm:"column:password" json:"password"`

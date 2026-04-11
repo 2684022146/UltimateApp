@@ -23,10 +23,7 @@ func NewSettingsController(settingsService service.SettingsService) *SettingsCon
 	}
 }
 func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
-	userId_ctx, exist := ctx.Get("user_id")
-	if !exist {
-		util.Fail(ctx, http.StatusUnauthorized, "请重新登录")
-	}
+	userId_ctx, _ := ctx.Get("user_id")
 	var req *model.CreateAddressRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, "参数错误")
@@ -41,11 +38,7 @@ func (controller *SettingsController) CreateAddress(ctx *gin.Context) {
 	util.Success(ctx, nil)
 }
 func (controller *SettingsController) AddressList(ctx *gin.Context) {
-	userId_ctx, exists := ctx.Get("user_id")
-	if !exists {
-		util.Fail(ctx, http.StatusUnauthorized, "请重新登陆")
-		return
-	}
+	userId_ctx, _ := ctx.Get("user_id")
 	userId := userId_ctx.(uint)
 	c := ctx.Request.Context()
 	addressSlice, err := controller.settingsService.AddressList(c, userId)
@@ -58,11 +51,7 @@ func (controller *SettingsController) AddressList(ctx *gin.Context) {
 
 }
 func (controller *SettingsController) AddressDetail(ctx *gin.Context) {
-	userId_ctx, exists := ctx.Get("user_id")
-	if !exists {
-		util.Fail(ctx, http.StatusUnauthorized, "请重新登录")
-		return
-	}
+	userId_ctx, _ := ctx.Get("user_id")
 	userId := userId_ctx.(uint)
 	addressIdStr := ctx.Query("address_id")
 	if addressIdStr == "" {
@@ -99,11 +88,7 @@ func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
 	util.Success(ctx, "success")
 }
 func (controller *SettingsController) DeleteAddress(ctx *gin.Context) {
-	userId_ctx, exists := ctx.Get("user_id")
-	if !exists {
-		util.Fail(ctx, http.StatusUnauthorized, "请重新登陆")
-		return
-	}
+	userId_ctx, _ := ctx.Get("user_id")
 	userId := userId_ctx.(uint)
 	addressIdStr := ctx.Query("address_id")
 	addressId, err := strconv.ParseUint(addressIdStr, 10, 64)
@@ -121,11 +106,7 @@ func (controller *SettingsController) DeleteAddress(ctx *gin.Context) {
 	util.Success(ctx, nil)
 }
 func (controller *SettingsController) SetDefault(ctx *gin.Context) {
-	userId_ctx, exists := ctx.Get("user_id")
-	if !exists {
-		util.Fail(ctx, http.StatusUnauthorized, consts.ReSignIn)
-		return
-	}
+	userId_ctx, _ := ctx.Get("user_id")
 	userId := userId_ctx.(uint)
 	addressIdStr := ctx.Query("address_id")
 	addressId, err := strconv.ParseUint(addressIdStr, 10, 64)

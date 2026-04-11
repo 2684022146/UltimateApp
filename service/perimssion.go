@@ -70,5 +70,6 @@ func (s *permissionService) RefreshPermissions() error {
 			s.permissionMap[role][method][apiPath] = true
 		}
 	}
+	log.Println("permissionMap", s.permissionMap)
 	return nil
 }

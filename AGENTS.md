@@ -157,24 +157,31 @@ CREATE TABLE `role_permissions` (
 
 #### 5.1.5 orders 表
 
-CREATE TABLE `orders` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '订单唯一ID（自增）',
-  `user_id` int unsigned NOT NULL COMMENT '关联收货人ID（逻辑外键，关联users表id）',
-  `address_id` int unsigned NOT NULL COMMENT '关联收货地址ID（逻辑外键，关联addresses表id）',
-  `order_no` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '订单编号（唯一，用于前端展示/查询）',
-  `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '订单状态：1-待配送 / 2-配送中 / 3-已完成 / 4-已取消',
-  `goods_info` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '货物信息（如：生鲜食品 2件）',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建时间（自动填充）',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
-   `delivery_user_id` int NOT NULL COMMENT '配送员ID',
-  COMMENT '订单更新时间（自动更新）',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uk_order_no` (`order_no`) USING BTREE,
-  KEY `idx_user_id` (`user_id`) USING BTREE,
-  KEY `idx_status` (`status`) USING BTREE,
-  KEY `idx_user_status` (`user_id`,`status`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='配送订单表（实时物流追踪核心业务表）';
-
+create table orders
+(
+    id                 int unsigned auto_increment comment '订单唯一ID（自增）'
+        primary key,
+    sender_user_id     int unsigned                               not null comment '关联寄件人ID（逻辑外键，关联users表id）',
+    sender_address_id  int unsigned                               not null comment '关联寄件人地址ID（逻辑外键，关联addresses表id）',
+    order_no           varchar(32)                                not null comment '订单编号（唯一，用于前端展示/查询）',
+    status             tinyint unsigned default '1'               not null comment '订单状态：1-待接单/2-已接单待配送 / 3-配送中 / 4-已完成 / 5-已取消',
+    goods_info         varchar(255)                               null comment '货物信息（如：生鲜食品 2件）',
+    receiver_name      varchar(32)                                not null comment '收货人姓名',
+    receiver_phone     varchar(16)                                not null comment '收货人电话',
+    receiver_province  varchar(20)                                not null comment '收货人省份',
+    receiver_city      varchar(20)                                not null comment '收货人城市',
+    receiver_district  varchar(20)                                null comment '收货人区县',
+    receiver_street    varchar(50)                                null comment '收货人街道',
+    receiver_detail    varchar(128)                               not null comment '收货人详细地址',
+    receiver_latitude  decimal(10, 8)                             not null comment '收货人地址纬度',
+    receiver_longitude decimal(11, 8)                             not null comment '收货人地址经度',
+    delivery_user_id   int unsigned                               null comment '关联配送员ID（逻辑外键，关联users表id）',
+    create_time        datetime         default CURRENT_TIMESTAMP not null comment '订单创建时间（自动填充）',
+    update_time        datetime         default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '订单更新时间（自动更新）',
+    constraint uk_order_no
+        unique (order_no)
+)
+    comment '配送订单表（实时物流追踪核心业务表，包含寄件人和收件人信息）';
 #### 5.1.6 addresses 表
 
 CREATE TABLE `addresses` (
