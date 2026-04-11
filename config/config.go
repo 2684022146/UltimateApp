@@ -36,7 +36,7 @@ var (
 
 func InitConfig() *Config {
 	once.Do(func() {
-		configFile := "/Users/chengyue2304/webdemo/config/config.yaml"
+		configFile := "config/config.yaml"
 		v := viper.New()
 		v.SetConfigFile(configFile)
 		v.SetConfigType("yaml")

@@ -7,7 +7,7 @@ mysql:
   password: "123456"
   host: "127.0.0.1"
   port: 3306
-  db_name: "mydb"
+  db_name: "distribution_app"
   dsn_params: "charset=utf8mb4&parseTime=True&loc=Local"
   max_open_conns: 10
   max_idle_conns: 5
