@@ -58,32 +58,19 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 
 	}
 	//订单管理路由
-	ordersRepo := repository.NewOrdersRepository(db)
-	ordersService := service.NewOrdersService(ordersRepo)
-	ordersController := controller.NewOrdersController(ordersService)
+	// ordersRepo := repository.NewOrdersRepository(db)
+	// ordersService := service.NewOrdersService(ordersRepo)
+	// ordersController := controller.NewOrdersController(ordersService)
 
-	// 收货人订单路由组
-	consigneeOrdersGroup := authGroup.Group("/orders")
-	consigneeOrdersGroup.Use(middleware.RequireRole())
-	{
-		//订单列表
-		consigneeOrdersGroup.GET("/list", ordersController.OrderList)
-		//创建订单
-		consigneeOrdersGroup.POST("/create", ordersController.CreateOrder)
-	}
-
-	// 配送员订单路由
-	deliveryOrdersRepo := repository.NewDeliveryOrdersRepository(db)
-	deliveryOrdersService := service.NewDeliveryOrdersService(deliveryOrdersRepo)
-	deliveryOrdersController := controller.NewDeliveryOrdersController(deliveryOrdersService)
-
-	// 配送员订单路由组
-	deliveryOrdersGroup := authGroup.Group("/delivery/orders")
-	deliveryOrdersGroup.Use(middleware.RequireRole())
-	{
-		//配送员待配送订单列表
-		deliveryOrdersGroup.GET("/list", deliveryOrdersController.DeliveryOrderList)
-	}
+	// // 收货人订单路由组
+	// consigneeOrdersGroup := authGroup.Group("/orders")
+	// consigneeOrdersGroup.Use(middleware.RequireRole())
+	// {
+	// 	//订单列表
+	// 	consigneeOrdersGroup.GET("/list", ordersController.OrderList)
+	// 	//创建订单
+	// 	consigneeOrdersGroup.POST("/create", ordersController.CreateOrder)
+	// }
 
 	return r
 }

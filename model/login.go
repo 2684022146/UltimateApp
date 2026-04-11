@@ -10,6 +10,7 @@ type User struct {
 	Password string `gorm:"column:password" json:"password"`
 	Id       uint   `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
 	RoleID   int8   `gorm:"column:role_id" json:"role_id"`
+	Phone    string `gorm:"column:phone" json:"phone"`
 }
 
 func (u User) TableName() string {

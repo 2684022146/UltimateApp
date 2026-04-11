@@ -2,50 +2,44 @@ package service
 
 import (
 	"context"
-	"fmt"
+
 	"time"
 	"webdemo/model"
 	"webdemo/repository"
 	"webdemo/util"
 )
 
-type OrdersService interface {
-	OrderList(ctx context.Context, userId uint) ([]*model.OrderResponse, error)
-	CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error
+type OrderService interface {
+	CreateOrder(ctx context.Context, order *model.Order) error
 }
-
-type ordersService struct {
+type orderService struct {
 	repo repository.OrdersRepository
 }
 
-func NewOrdersService(repo repository.OrdersRepository) OrdersService {
-	return &ordersService{
+func NewOrderService(repo repository.OrdersRepository) OrderService {
+	return &orderService{
 		repo: repo,
 	}
 }
-
-func (s *ordersService) OrderList(ctx context.Context, userId uint) ([]*model.OrderResponse, error) {
-	orders, err := s.repo.OrderList(ctx, userId)
-	if err != nil {
-		return nil, fmt.Errorf("%s", err)
+func (s *orderService) CreateOrder(ctx context.Context, order *model.Order) error {
+	// 设置默认值
+	if order.Status == 0 {
+		order.Status = 1 // 默认状态为待配送
 	}
-	return orders, nil
-}
 
-func (s *ordersService) CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error {
+	// 设置时间字段
 	now := time.Now().Format("2006-01-02 15:04:05")
-	order := &model.Order{
-		UserID:     userId,
-		AddressID:  req.AddressID,
-		OrderNo:    util.GenerateOrderNo(),
-		Status:     1, // 默认状态为待配送
-		GoodsInfo:  req.GoodsInfo,
-		CreateTime: now,
-		UpdateTime: now,
+	if order.CreateTime == "" {
+		order.CreateTime = now
 	}
-	err := s.repo.CreateOrder(ctx, order)
-	if err != nil {
-		return fmt.Errorf("创建订单失败:%w", err)
+	if order.UpdateTime == "" {
+		order.UpdateTime = now
 	}
-	return nil
+
+	// 生成订单号
+	if order.OrderNo == "" {
+		order.OrderNo = util.GenerateOrderNo()
+	}
+
+	return s.repo.CreateOrder(ctx, order)
 }
