@@ -66,10 +66,9 @@ POST|/api/orders/create|新建订单
 #### 3.1.2 任务执行流程
 1. 配送员接受任务
 2. 前往发货点取件
-3. 输入取件码，更新任务状态为「已取件」
+3. 更新任务状态为「已接单」
 4. 开始配送，实时上报位置
-5. 到达收货点，输入签收码，更新任务状态为「已签收」
-6. 获取收货人签名（可选）
+5. 到达目的地，更新任务状态为「已完成」
 7. 更新任务状态为「已完成」
 8. 系统更新物流订单状态
 9. 通知收货人
@@ -79,7 +78,6 @@ POST|/api/orders/create|新建订单
 2. 修改个人信息（如手机号、地址）
 3. 添加新订单（包括订单详情、配送地址、联系电话等）
 4. 查看订单状态（包括取件状态、配送状态、签收状态等）
-5. 确认签收订单（输入签收码，更新订单状态为「已签收」）
 
 #### 3.1.4 异常处理流程
 1. 配送员遇到异常情况（如交通堵塞、找不到地址）
@@ -157,12 +155,10 @@ CREATE TABLE `role_permissions` (
 
 #### 5.1.5 orders 表
 
-create table orders
-(
-    id                 int unsigned auto_increment comment '订单唯一ID（自增）'
-        primary key,
+create table orders(
+    id                 int unsigned auto_increment comment '订单唯一ID（自增）'primary key,
     sender_user_id     int unsigned                               not null comment '关联寄件人ID（逻辑外键，关联users表id）',
-    sender_address_id  int unsigned                               not null comment '关联寄件人地址ID（逻辑外键，关联addresses表id）',
+    sender_address_id  int unsigned                               not null comment '关联寄件人地址ID（逻辑外键，关联addresses表id',
     order_no           varchar(32)                                not null comment '订单编号（唯一，用于前端展示/查询）',
     status             tinyint unsigned default '1'               not null comment '订单状态：1-待接单/2-已接单待配送 / 3-配送中 / 4-已完成 / 5-已取消',
     goods_info         varchar(255)                               null comment '货物信息（如：生鲜食品 2件）',
@@ -177,7 +173,7 @@ create table orders
     receiver_longitude decimal(11, 8)                             not null comment '收货人地址经度',
     delivery_user_id   int unsigned                               null comment '关联配送员ID（逻辑外键，关联users表id）',
     create_time        datetime         default CURRENT_TIMESTAMP not null comment '订单创建时间（自动填充）',
-    update_time        datetime         default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '订单更新时间（自动更新）',
+    update_time        datetime         default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '订单更新时间（自动填充，每次更新时自动更新）',
     constraint uk_order_no
         unique (order_no)
 )

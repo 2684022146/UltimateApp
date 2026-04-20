@@ -62,14 +62,49 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 	ordersService := service.NewOrdersService(ordersRepo)
 	ordersController := controller.NewOrdersController(ordersService)
 
-	// 收货人订单路由组
+	// 客户订单路由组
 	consigneeOrdersGroup := authGroup.Group("/orders")
 	consigneeOrdersGroup.Use(middleware.RequireRole())
 	{
-		//订单列表
-		//consigneeOrdersGroup.GET("/list", ordersController.OrderList)
+
 		//创建订单
 		consigneeOrdersGroup.POST("/create", ordersController.CreateOrder)
+	}
+	senderOrderGroup := consigneeOrdersGroup.Group("/sender")
+	senderOrderGroup.Use(middleware.RequireRole())
+	{
+		//获取寄件人已完成订单 我寄出的已完成订单
+		senderOrderGroup.GET("/finished", ordersController.SenderFinishedOrder)
+		//获取我在寄出的途中订单 我寄出的在途中订单
+		senderOrderGroup.GET("/delivering", ordersController.SenderInTransitOrder)
+		//获取我在寄出的待接单订单 我寄出的待接单订单
+		senderOrderGroup.GET("/waiting", ordersController.SenderWaitingOrder)
+		//取消订单
+		senderOrderGroup.POST("/cancel", ordersController.SenderCencelOrder)
+
+	}
+	receiverOrderGroup := consigneeOrdersGroup.Group("/receiver")
+	receiverOrderGroup.Use(middleware.RequireRole())
+	{
+		//获取收件人已完成订单
+		receiverOrderGroup.GET("/finished", ordersController.ReceiverFinishedOrder)
+		//获取收件人途中订单
+		receiverOrderGroup.GET("/delivering", ordersController.ReceiverInTransitOrder)
+	}
+	riderGroup := authGroup.Group("/rider")
+	//暂时注释掉权限中间件，以便测试骑手接单的业务逻辑
+	//riderGroup.Use(middleware.RequireRole())
+	{
+		//骑手待接单订单
+		riderGroup.GET("/waiting", ordersController.RiderOrderList)
+		//骑手接单
+		riderGroup.POST("/accept", ordersController.AcceptOrder)
+		//开始配送
+		riderGroup.POST("/start", ordersController.StartDelivery)
+		//上传位置
+		riderGroup.POST("/location", ordersController.UploadLocation)
+		//完成订单
+		riderGroup.POST("/complete", ordersController.CompleteOrder)
 	}
 
 	return r

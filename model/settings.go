@@ -18,16 +18,16 @@ type Address struct {
 
 // CreateAddressRequest 创建地址请求
 type CreateAddressRequest struct {
-	Province  string  `json:"province" binding:"required"`
-	City      string  `json:"city" binding:"required"`
-	District  string  `json:"district"`
-	Street    string  `json:"street"`
-	Detail    string  `json:"detail" binding:"required"`
-	Receiver  string  `json:"receiver" binding:"required"`
-	Phone     string  `json:"phone" binding:"required"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	IsDefault int8    `json:"is_default"`
+	Province string `json:"province" binding:"required"`
+	City     string `json:"city" binding:"required"`
+	District string `json:"district"`
+	Street   string `json:"street"`
+	Detail   string `json:"detail" binding:"required"`
+	Receiver string `json:"receiver" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
+	// Latitude  float64 `json:"latitude"`
+	// Longitude float64 `json:"longitude"`
+	IsDefault int8 `json:"is_default"`
 }
 
 // UpdateAddressRequest 更新地址请求

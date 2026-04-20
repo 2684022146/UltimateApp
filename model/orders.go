@@ -24,6 +24,16 @@ type Order struct {
 	DeliveryUserID    *uint     `gorm:"column:delivery_user_id" json:"delivery_user_id"`
 	CreateTime        time.Time `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP" json:"create_time"`
 	UpdateTime        time.Time `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;autoUpdateTime" json:"update_time"`
+	// 寄件人地址信息（通过 JOIN 查询填充）
+	SenderProvince  string  `gorm:"-" json:"sender_province"`
+	SenderCity      string  `gorm:"-" json:"sender_city"`
+	SenderDistrict  string  `gorm:"-" json:"sender_district"`
+	SenderStreet    string  `gorm:"-" json:"sender_street"`
+	SenderDetail    string  `gorm:"-" json:"sender_detail"`
+	SenderReceiver  string  `gorm:"-" json:"sender_receiver"`
+	SenderPhone     string  `gorm:"-" json:"sender_phone"`
+	SenderLatitude  float64 `gorm:"-" json:"sender_latitude"`
+	SenderLongitude float64 `gorm:"-" json:"sender_longitude"`
 }
 
 // CreateOrderRequest 创建订单请求
@@ -83,4 +93,31 @@ type AddressInfo struct {
 
 func (order Order) TableName() string {
 	return "orders"
+}
+
+// DeliveryAssign 配送分配表结构体
+type DeliveryAssign struct {
+	ID             uint      `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
+	OrderID        uint      `gorm:"column:order_id;not null" json:"order_id"`
+	DeliveryUserID uint      `gorm:"column:delivery_user_id;not null" json:"delivery_user_id"`
+	AssignUserID   uint      `gorm:"column:assign_user_id;not null" json:"assign_user_id"`
+	AssignTime     time.Time `gorm:"column:assign_time;not null;default:CURRENT_TIMESTAMP" json:"assign_time"`
+}
+
+func (da DeliveryAssign) TableName() string {
+	return "delivery_assign"
+}
+
+// LocationTrace 位置轨迹表结构体
+type LocationTrace struct {
+	ID             uint      `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
+	OrderID        uint      `gorm:"column:order_id;not null" json:"order_id"`
+	DeliveryUserID uint      `gorm:"column:delivery_user_id;not null" json:"delivery_user_id"`
+	Longitude      float64   `gorm:"column:longitude;not null" json:"longitude"`
+	Latitude       float64   `gorm:"column:latitude;not null" json:"latitude"`
+	UploadTime     time.Time `gorm:"column:upload_time;not null;default:CURRENT_TIMESTAMP" json:"upload_time"`
+}
+
+func (lt LocationTrace) TableName() string {
+	return "location_traces"
 }

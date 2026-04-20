@@ -53,3 +53,17 @@ func SuccessWithMsg(c *gin.Context, msg string, data interface{}) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+// 5. SelectOrderSuccess 分页订单查询响应
+// 返回订单列表和总数
+func SelectOrderSuccess(c *gin.Context, list interface{}, total int64) {
+	response := ApiResponse{
+		Code: 200,
+		Msg:  "操作成功",
+		Data: gin.H{
+			"list":  list,
+			"total": total,
+		},
+	}
+	c.JSON(http.StatusOK, response)
+}
