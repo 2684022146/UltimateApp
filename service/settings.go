@@ -12,11 +12,15 @@ import (
 	"webdemo/repository"
 )
 
+const (
+	apiUrl = "https://restapi.amap.com/v3/geocode/geo?address=%s&output=JSON&key=74e8efb95dcff3e269ce54497a8d1b18"
+)
+
 type SettingsService interface {
 	CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId uint) error
 	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
 	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
-	UpdateAddress(ctx context.Context, req *model.Address) error
+	UpdateAddress(ctx context.Context, req *model.Address, userId uint) error
 	DeleteAddress(ctx context.Context, addressId, userId uint) error
 	SetDefault(ctx context.Context, addressId, userId uint) error
 }
@@ -30,17 +34,7 @@ func NewSettingsService(repo repository.SettingsRepository) SettingsService {
 	}
 }
 
-type GeocodeResponse struct {
-	Status   string    `json:"status"`
-	Geocodes []Geocode `json:"geocodes"`
-}
-type Geocode struct {
-	Location string `json:"location"`
-}
 
-const (
-	apiUrl = "https://restapi.amap.com/v3/geocode/geo?address=%s&output=JSON&key=74e8efb95dcff3e269ce54497a8d1b18"
-)
 
 func (s *settingsService) CreateAddress(ctx context.Context, req *model.CreateAddressRequest, userId uint) error {
 	completeAddress := fmt.Sprintf("%s%s%s%s%s", req.Province, req.City, req.District, req.Street, req.Detail)
@@ -56,7 +50,7 @@ func (s *settingsService) CreateAddress(ctx context.Context, req *model.CreateAd
 	}
 	fmt.Println(string(body))
 
-	var geocodeResp GeocodeResponse
+	var geocodeResp model.GeocodeResponse
 	err = json.Unmarshal(body, &geocodeResp)
 	if err != nil {
 		return fmt.Errorf("解析地址信息失败:%w", err)
@@ -103,8 +97,52 @@ func (s *settingsService) AddressList(ctx context.Context, userId uint) ([]*mode
 func (s *settingsService) AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error) {
 	return s.repo.AddressDetail(ctx, addressId, userId)
 }
-func (s *settingsService) UpdateAddress(ctx context.Context, req *model.Address) error {
-	if err := s.repo.UpdateAddress(ctx, req); err != nil {
+func (s *settingsService) UpdateAddress(ctx context.Context, req *model.Address, userId uint) error {
+	completeAddress := fmt.Sprintf("%s%s%s%s%s", req.Province, req.City, req.District, req.Street, req.Detail)
+	url := fmt.Sprintf(apiUrl, completeAddress)
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("api失败:%w", err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("读取地址信息失败:%w", err)
+	}
+	fmt.Println(string(body))
+
+	var geocodeResp model.GeocodeResponse
+	err = json.Unmarshal(body, &geocodeResp)
+	if err != nil {
+		return fmt.Errorf("解析地址信息失败:%w", err)
+	}
+	if geocodeResp.Status != "1" || len(geocodeResp.Geocodes) == 0 {
+		return fmt.Errorf("api获取geo失败:%s", geocodeResp.Status)
+	}
+	coordinates := geocodeResp.Geocodes[0].Location
+	parts := strings.Split(coordinates, ",")
+	longitudeStr := parts[0]
+	longitude, _ := strconv.ParseFloat(longitudeStr, 64)
+	latitudeStr := parts[1]
+	latitude, _ := strconv.ParseFloat(latitudeStr, 64)
+	if err != nil {
+		return fmt.Errorf("获取地址信息失败:%w", err)
+	}
+	address := &model.Address{
+		ID:        req.ID,
+		UserID:    userId,
+		Province:  req.Province,
+		City:      req.City,
+		District:  req.District,
+		Street:    req.Street,
+		Detail:    req.Detail,
+		Receiver:  req.Receiver,
+		Phone:     req.Phone,
+		Latitude:  latitude,
+		Longitude: longitude,
+		IsDefault: req.IsDefault,
+	}
+	if err := s.repo.UpdateAddress(ctx, address, userId); err != nil {
 		return fmt.Errorf("%w", err)
 	}
 	return nil

@@ -74,6 +74,8 @@ func (controller *SettingsController) AddressDetail(ctx *gin.Context) {
 }
 func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
 	var req *model.Address
+	userId_ctx, _ := ctx.Get("user_id")
+	userId := userId_ctx.(uint)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, "参数错误")
@@ -81,7 +83,7 @@ func (controller *SettingsController) UpdateAddress(ctx *gin.Context) {
 	}
 	log.Println(req.IsDefault)
 	c := ctx.Request.Context()
-	if err := controller.settingsService.UpdateAddress(c, req); err != nil {
+	if err := controller.settingsService.UpdateAddress(c, req, userId); err != nil {
 		util.Fail(ctx, http.StatusBadRequest, "修改地址失败")
 		return
 	}

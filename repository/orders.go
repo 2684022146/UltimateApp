@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 	"webdemo/consts"
 	"webdemo/model"
@@ -11,6 +12,8 @@ import (
 
 type OrdersRepository interface {
 	CreateOrder(ctx context.Context, order *model.Order) error
+	OrderDetailBasic(ctx context.Context, orderNo string) (*model.Order, error)
+	//
 	SenderFinishedOrder(ctx context.Context, userID uint, pageInfo *model.Page) ([]*model.Order, int64, error)
 	SenderInTransitOrder(ctx context.Context, userID uint, pageInfo *model.Page) ([]*model.Order, int64, error)
 	SenderWaitingOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.Order, int64, error)
@@ -19,9 +22,10 @@ type OrdersRepository interface {
 	ReceiverFinishedOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.Order, int64, error)
 	ReceiverInTransitOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.Order, int64, error)
 	//
-	RiderOrderList(ctx context.Context, pageInfo *model.Page) ([]*model.Order, int64, error)
+	RiderOrderList(ctx context.Context, status int, pageInfo *model.Page) ([]*model.Order, int64, error)
 	// 骑手相关
 	AcceptOrder(ctx context.Context, orderNo string, deliveryUserID uint) error
+	PickupOrder(ctx context.Context, orderNo string) error
 	StartDelivery(ctx context.Context, orderNo string) error
 	UploadLocation(ctx context.Context, orderID uint, deliveryUserID uint, longitude, latitude float64) error
 	CompleteOrder(ctx context.Context, orderNo string) error
@@ -44,6 +48,37 @@ func (r *ordersRepository) CreateOrder(ctx context.Context, order *model.Order) 
 		return nil
 	})
 }
+func (r *ordersRepository) OrderDetailBasic(ctx context.Context, orderNo string) (*model.Order, error) {
+	var order model.Order
+
+	// 1. 先查询订单基本信息
+	err := r.db.WithContext(ctx).Where("order_no = ?", orderNo).First(&order).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. 再根据sender_address_id查询地址信息
+	var address model.Address
+	err = r.db.WithContext(ctx).Where("id = ?", order.SenderAddressID).First(&address).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. 组装寄件人地址信息到order结构体
+	order.SenderProvince = address.Province
+	order.SenderCity = address.City
+	order.SenderDistrict = address.District
+	order.SenderStreet = address.Street
+	order.SenderDetail = address.Detail
+	order.SenderReceiver = address.Receiver
+	order.SenderPhone = address.Phone
+	order.SenderLatitude = address.Latitude
+	order.SenderLongitude = address.Longitude
+
+	return &order, nil
+}
+
+// ///////////////////
 func (r *ordersRepository) SenderFinishedOrder(ctx context.Context, userID uint, pageInfo *model.Page) ([]*model.Order, int64, error) {
 	var orderList []*model.Order
 	var total int64
@@ -59,6 +94,7 @@ func (r *ordersRepository) SenderFinishedOrder(ctx context.Context, userID uint,
 		currentPage = 1
 	}
 	offset := (currentPage - 1) * pageInfo.PerPage
+	log.Printf("offset: %d, limit: %d", offset, pageInfo.PerPage)
 	err := query.Offset(offset).Limit(pageInfo.PerPage).Find(&orderList).Error
 	if err != nil {
 		return nil, total, err
@@ -71,7 +107,7 @@ func (r *ordersRepository) SenderInTransitOrder(ctx context.Context, userID uint
 	var total int64
 	query := r.db.WithContext(ctx).Model(&model.Order{}).
 		Joins("LEFT JOIN addresses ON orders.sender_address_id = addresses.id").
-		Where("orders.sender_user_id=? and orders.status IN (?)", userID, []int{consts.OrderBeforeDelivery, consts.OrderDelivering}).
+		Where("orders.sender_user_id=? and orders.status IN (?)", userID, []int{consts.OrderBeforePickUp, consts.OrderPickup, consts.OrderDelivering}).
 		Select("orders.*, addresses.province as sender_province, addresses.city as sender_city, addresses.district as sender_district, addresses.street as sender_street, addresses.detail as sender_detail, addresses.receiver as sender_receiver, addresses.phone as sender_phone, addresses.latitude as sender_latitude, addresses.longitude as sender_longitude")
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -97,6 +133,8 @@ func (r *ordersRepository) SenderWaitingOrder(ctx context.Context, usrId uint, p
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
+	log.Printf("pageInfo.per_page: %d", pageInfo.PerPage)
+
 	currentPage := pageInfo.CurrentPage
 	if currentPage < 1 {
 		currentPage = 1
@@ -144,7 +182,7 @@ func (r *ordersRepository) ReceiverInTransitOrder(ctx context.Context, userId ui
 	query := r.db.WithContext(ctx).Model(&model.Order{}).
 		Joins("JOIN users ON orders.receiver_phone=users.phone").
 		Joins("LEFT JOIN addresses ON orders.sender_address_id = addresses.id").
-		Where("users.id=? and orders.status=?", userId, consts.OrderDelivering).
+		Where("users.id=? and orders.status=?", userId, []int{consts.OrderBeforePickUp, consts.OrderPickup, consts.OrderDelivering}).
 		Select("orders.*, addresses.province as sender_province, addresses.city as sender_city, addresses.district as sender_district, addresses.street as sender_street, addresses.detail as sender_detail, addresses.receiver as sender_receiver, addresses.phone as sender_phone, addresses.latitude as sender_latitude, addresses.longitude as sender_longitude")
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -162,12 +200,12 @@ func (r *ordersRepository) ReceiverInTransitOrder(ctx context.Context, userId ui
 }
 
 // ///////////////////
-func (r *ordersRepository) RiderOrderList(ctx context.Context, pageInfo *model.Page) ([]*model.Order, int64, error) {
+func (r *ordersRepository) RiderOrderList(ctx context.Context, status int, pageInfo *model.Page) ([]*model.Order, int64, error) {
 	var orderList []*model.Order
 	var total int64
 	query := r.db.WithContext(ctx).Model(&model.Order{}).
 		Joins("LEFT JOIN addresses ON orders.sender_address_id = addresses.id").
-		Where("orders.status=?", consts.OrderWaiting).
+		Where("orders.status=?", status).
 		Select("orders.*, addresses.province as sender_province, addresses.city as sender_city, addresses.district as sender_district, addresses.street as sender_street, addresses.detail as sender_detail, addresses.receiver as sender_receiver, addresses.phone as sender_phone, addresses.latitude as sender_latitude, addresses.longitude as sender_longitude")
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -192,14 +230,25 @@ func (r *ordersRepository) AcceptOrder(ctx context.Context, orderNo string, deli
 		if err := tx.Where("order_no=?", orderNo).First(&order).Error; err != nil {
 			return err
 		}
-		order.Status = consts.OrderBeforeDelivery
+		order.Status = consts.OrderBeforePickUp
 		order.DeliveryUserID = &deliveryUserID
 		if err := tx.Save(&order).Error; err != nil {
 			return err
 		}
-		// 暂时跳过插入delivery_assign表的操作，避免数据库错误
-		// 后续可以修复delivery_assign表的结构后再添加这部分逻辑
+		//插入配送关系
+		if err := tx.Create(&model.DeliveryAssign{
+			OrderID:        order.ID,
+			DeliveryUserID: deliveryUserID,
+		}).Error; err != nil {
+			return err
+		}
 		return nil
+	})
+}
+func (r *ordersRepository) PickupOrder(ctx context.Context, orderNo string) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// 更新订单状态为已取件待配送
+		return tx.Model(&model.Order{}).Where("order_no=?", orderNo).Update("status", consts.OrderPickup).Error
 	})
 }
 

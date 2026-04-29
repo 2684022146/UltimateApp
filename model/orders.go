@@ -48,8 +48,8 @@ type CreateOrderRequest struct {
 	ReceiverDistrict  string  `json:"receiver_district"`
 	ReceiverStreet    string  `json:"receiver_street"`
 	ReceiverDetail    string  `json:"receiver_detail" binding:"required"`
-	ReceiverLatitude  float64 `json:"receiver_latitude" binding:"required"`
-	ReceiverLongitude float64 `json:"receiver_longitude" binding:"required"`
+	ReceiverLatitude  float64 `json:"receiver_latitude"`
+	ReceiverLongitude float64 `json:"receiver_longitude"`
 }
 
 // OrderResponse 订单响应结构体（包含地址信息）
@@ -97,11 +97,9 @@ func (order Order) TableName() string {
 
 // DeliveryAssign 配送分配表结构体
 type DeliveryAssign struct {
-	ID             uint      `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
-	OrderID        uint      `gorm:"column:order_id;not null" json:"order_id"`
-	DeliveryUserID uint      `gorm:"column:delivery_user_id;not null" json:"delivery_user_id"`
-	AssignUserID   uint      `gorm:"column:assign_user_id;not null" json:"assign_user_id"`
-	AssignTime     time.Time `gorm:"column:assign_time;not null;default:CURRENT_TIMESTAMP" json:"assign_time"`
+	ID             uint `gorm:"primaryKey;column:id;autoIncrement" json:"id"`
+	OrderID        uint `gorm:"column:order_id;not null" json:"order_id"`
+	DeliveryUserID uint `gorm:"column:delivery_user_id;not null" json:"delivery_user_id"`
 }
 
 func (da DeliveryAssign) TableName() string {

@@ -18,40 +18,508 @@
 
 ### 2.1 认证相关接口
 
-| 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
-|------|------|----------|---------------|-------------------|
+#### 用户注册
 
+**路径** : `/api/auth/register`  
+**方法** : `POST`  
+**功能描述** : 用户注册，创建新用户账号
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| username | string | 是 | 用户名（手机号） |
+| password | string | 是 | 用户密码 |
+| role_id | int | 否 | 角色ID（默认2-收货人） |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 用户登录
+
+**路径** : `/api/auth/login`  
+**方法** : `POST`  
+**功能描述** : 用户登录，获取JWT token
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| username | string | 是 | 用户名（手机号） |
+| password | string | 是 | 用户密码 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "username": "13800138000",
+      "role_id": 1
+    }
+  }
+}
+```
 
 ### 2.2 收货人信息管理接口
 
-| 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
-|------|------|----------|---------------|-------------------|
-Get|/api/settings/address/list|地址列表
-Get|/api/settings/address地址详情
-Post|/api/settings/address/create|新建地址
-Put|/api/seetings/address|修改地址
-Delete|/api/settings/address|删除地址
-Put|/api/settings/address/default|设置默认地址
-Post|/api/settings/logout|退出登陆
+#### 获取地址列表
 
-### 2.3 任务管理接口
+**路径** : `/api/settings/address/list`  
+**方法** : `GET`  
+**功能描述** : 获取当前用户的所有收货地址
 
-| 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
-|------|------|----------|---------------|-------------------|
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "province": "北京市",
+      "city": "北京市",
+      "district": "朝阳区",
+      "street": "望京街道",
+      "detail": "XX小区1栋101",
+      "receiver": "张三",
+      "phone": "13800138000",
+      "latitude": 39.908823,
+      "longitude": 116.397470,
+      "is_default": 1
+    }
+  ]
+}
+```
 
+#### 获取地址详情
 
-### 2.4 位置管理接口
+**路径** : `/api/settings/address`  
+**方法** : `GET`  
+**功能描述** : 获取指定地址的详细信息
 
-| 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
-|------|------|----------|---------------|-------------------|
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| id | int | 是 | 地址ID |
 
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "province": "北京市",
+    "city": "北京市",
+    "district": "朝阳区",
+    "street": "望京街道",
+    "detail": "XX小区1栋101",
+    "receiver": "张三",
+    "phone": "13800138000",
+    "latitude": 39.908823,
+    "longitude": 116.397470,
+    "is_default": 1
+  }
+}
+```
 
-### 2.5 订单管理接口
+#### 新建地址
 
-| 方法 | 路径 | 功能描述 | 请求体 (JSON) | 成功响应 (200 OK) |
-|------|------|----------|---------------|-------------------|
-GET|/api/orders/list|订单列表
-POST|/api/orders/create|新建订单
+**路径** : `/api/settings/address/create`  
+**方法** : `POST`  
+**功能描述** : 创建新的收货地址
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| province | string | 是 | 省份 |
+| city | string | 是 | 城市 |
+| district | string | 否 | 区县 |
+| street | string | 否 | 街道 |
+| detail | string | 是 | 详细地址 |
+| receiver | string | 是 | 收件人姓名 |
+| phone | string | 是 | 收件人电话 |
+| is_default | int | 否 | 是否默认地址（0-否，1-是） |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 修改地址
+
+**路径** : `/api/settings/address`  
+**方法** : `PUT`  
+**功能描述** : 修改收货地址信息
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| id | int | 是 | 地址ID |
+| province | string | 是 | 省份 |
+| city | string | 是 | 城市 |
+| district | string | 否 | 区县 |
+| street | string | 否 | 街道 |
+| detail | string | 是 | 详细地址 |
+| receiver | string | 是 | 收件人姓名 |
+| phone | string | 是 | 收件人电话 |
+| is_default | int | 否 | 是否默认地址（0-否，1-是） |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 删除地址
+
+**路径** : `/api/settings/address`  
+**方法** : `DELETE`  
+**功能描述** : 删除指定的收货地址
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| id | int | 是 | 地址ID |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 设置默认地址
+
+**路径** : `/api/settings/address/default`  
+**方法** : `PUT`  
+**功能描述** : 设置指定地址为默认地址
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| id | int | 是 | 地址ID |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 退出登录
+
+**路径** : `/api/settings/logout`  
+**方法** : `POST`  
+**功能描述** : 用户退出登录
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+### 2.3 订单管理接口
+
+#### 获取订单列表
+
+**路径** : `/api/orders/list`  
+**方法** : `GET`  
+**功能描述** : 获取当前用户的订单列表
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| current_page | int | 否 | 当前页码（默认1） |
+| per_page | int | 否 | 每页数量（默认10） |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "order_no": "ORD123456789",
+        "status": 1,
+        "goods_info": "生鲜食品 2件",
+        "receiver_name": "李四",
+        "receiver_phone": "13900139000",
+        "create_time": "2024-01-01 10:00:00"
+      }
+    ],
+    "total": 10,
+    "current_page": 1,
+    "per_page": 10
+  }
+}
+```
+
+#### 创建订单
+
+**路径** : `/api/orders/create`  
+**方法** : `POST`  
+**功能描述** : 创建新的配送订单
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| sender_address_id | int | 是 | 寄件人地址ID |
+| goods_info | string | 否 | 货物信息 |
+| receiver_name | string | 是 | 收货人姓名 |
+| receiver_phone | string | 是 | 收货人电话 |
+| receiver_province | string | 是 | 收货人省份 |
+| receiver_city | string | 是 | 收货人城市 |
+| receiver_district | string | 否 | 收货人区县 |
+| receiver_street | string | 否 | 收货人街道 |
+| receiver_detail | string | 是 | 收货人详细地址 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 获取订单详情
+
+**路径** : `/api/orders/detail`  
+**方法** : `GET`  
+**功能描述** : 获取订单详细信息
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "order_no": "ORD123456789",
+    "status": 1,
+    "goods_info": "生鲜食品 2件",
+    "sender_province": "北京市",
+    "sender_city": "北京市",
+    "sender_district": "朝阳区",
+    "sender_detail": "XX小区1栋101",
+    "sender_receiver": "张三",
+    "sender_phone": "13800138000",
+    "receiver_name": "李四",
+    "receiver_phone": "13900139000",
+    "receiver_province": "上海市",
+    "receiver_city": "上海市",
+    "receiver_district": "浦东新区",
+    "receiver_detail": "YY小区2栋202",
+    "delivery_user_id": null,
+    "create_time": "2024-01-01 10:00:00",
+    "update_time": "2024-01-01 10:00:00"
+  }
+}
+```
+
+### 2.4 配送员任务管理接口
+
+#### 获取待接单订单列表
+
+**路径** : `/api/rider/waiting`  
+**方法** : `GET`  
+**功能描述** : 配送员获取待接单的订单列表
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| current_page | int | 否 | 当前页码（默认1） |
+| per_page | int | 否 | 每页数量（默认10） |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "order_no": "ORD123456789",
+        "status": 1,
+        "goods_info": "生鲜食品 2件",
+        "sender_detail": "XX小区1栋101",
+        "receiver_detail": "YY小区2栋202"
+      }
+    ],
+    "total": 5,
+    "current_page": 1,
+    "per_page": 10
+  }
+}
+```
+
+#### 接单
+
+**路径** : `/api/rider/accept`  
+**方法** : `POST`  
+**功能描述** : 配送员接单，更新订单状态为已接单
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 取件
+
+**路径** : `/api/rider/pickup`  
+**方法** : `POST`  
+**功能描述** : 配送员取件，更新订单状态为已取件待配送
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 开始配送
+
+**路径** : `/api/rider/start`  
+**方法** : `POST`  
+**功能描述** : 配送员开始配送，更新订单状态为配送中
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 完成订单
+
+**路径** : `/api/rider/complete`  
+**方法** : `POST`  
+**功能描述** : 配送员完成配送，更新订单状态为已完成
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+### 2.5 位置管理接口
+
+#### 上传位置
+
+**路径** : `/api/rider/location`  
+**方法** : `POST`  
+**功能描述** : 配送员上传实时位置信息
+
+**请求体 (JSON)** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_id | int | 是 | 订单ID |
+| longitude | float | 是 | 经度 |
+| latitude | float | 是 | 纬度 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": null
+}
+```
+
+#### 获取配送轨迹
+
+**路径** : `/api/orders/trace`  
+**方法** : `GET`  
+**功能描述** : 获取订单的配送轨迹
+
+**查询参数** : 
+| 参数名 | 类型 | 必填 | 描述 | 
+|--------|------|------|------| 
+| order_no | string | 是 | 订单编号 |
+
+**成功响应 (200 OK)** : 
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": [
+    {
+      "longitude": 116.397470,
+      "latitude": 39.908823,
+      "upload_time": "2024-01-01 10:00:00"
+    },
+    {
+      "longitude": 116.400000,
+      "latitude": 39.910000,
+      "upload_time": "2024-01-01 10:05:00"
+    }
+  ]
+}
+```
 ## 3. 业务逻辑
 
 ### 3.1 核心业务流程
@@ -160,7 +628,7 @@ create table orders(
     sender_user_id     int unsigned                               not null comment '关联寄件人ID（逻辑外键，关联users表id）',
     sender_address_id  int unsigned                               not null comment '关联寄件人地址ID（逻辑外键，关联addresses表id',
     order_no           varchar(32)                                not null comment '订单编号（唯一，用于前端展示/查询）',
-    status             tinyint unsigned default '1'               not null comment '订单状态：1-待接单/2-已接单待配送 / 3-配送中 / 4-已完成 / 5-已取消',
+    status             tinyint unsigned default '1'               not null comment '订单状态：1-待接单/2-已接单待取件/ 3-配送中 / 4-已完成 / 5-已取消 /6-已取件待配送',
     goods_info         varchar(255)                               null comment '货物信息（如：生鲜食品 2件）',
     receiver_name      varchar(32)                                not null comment '收货人姓名',
     receiver_phone     varchar(16)                                not null comment '收货人电话',

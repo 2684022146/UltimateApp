@@ -13,7 +13,7 @@ type SettingsRepository interface {
 	CreateAddress(ctx context.Context, req *model.Address) error
 	AddressList(ctx context.Context, userId uint) ([]*model.Address, error)
 	AddressDetail(ctx context.Context, addressId, userId uint) (*model.Address, error)
-	UpdateAddress(ctx context.Context, req *model.Address) error
+	UpdateAddress(ctx context.Context, req *model.Address, userId uint) error
 	DeleteAddress(ctx context.Context, addressId, userId uint) error
 	SetDefault(ctx context.Context, addressId, userId uint) error
 }
@@ -85,7 +85,7 @@ func (r *settingsRepository) AddressDetail(ctx context.Context, addressId, userI
 	}
 	return address, nil
 }
-func (r *settingsRepository) UpdateAddress(ctx context.Context, req *model.Address) error {
+func (r *settingsRepository) UpdateAddress(ctx context.Context, req *model.Address, userId uint) error {
 	tx := r.db.WithContext(ctx).Begin()
 	var txErr error
 	defer func() {
@@ -101,13 +101,13 @@ func (r *settingsRepository) UpdateAddress(ctx context.Context, req *model.Addre
 		}
 	}()
 	if req.IsDefault == 1 {
-		err := tx.Model(&model.Address{}).Where("user_id=?", req.UserID).Update("is_default", 0).Error
+		err := tx.Model(&model.Address{}).Where("user_id=?", userId).Update("is_default", 0).Error
 		if err != nil {
 			txErr = errors.New("更新默认地址失败")
 			return txErr
 		}
 	}
-	err := tx.Model(&model.Address{}).Where("id=? AND user_id=?", req.ID, req.UserID).Select("*").Updates(req).Error
+	err := tx.Model(&model.Address{}).Where("id=? AND user_id=?", req.ID, userId).Select("*").Updates(req).Error
 	if err != nil {
 		txErr = errors.New("更新地址失败")
 		return txErr

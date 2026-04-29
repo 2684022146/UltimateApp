@@ -13,6 +13,11 @@ import (
 
 func InitRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	// 设置默认编码为UTF-8
+	r.Use(func(c *gin.Context) {
+		c.Request.Header.Set("Content-Type", "application/json; charset=utf-8")
+		c.Next()
+	})
 	//跨域
 	r.Use(cors.New(cors.Config{
 		// 允许的前端来源（生产环境替换为你的前端域名，如 http://localhost:5500）
@@ -69,6 +74,8 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 
 		//创建订单
 		consigneeOrdersGroup.POST("/create", ordersController.CreateOrder)
+		//获取订单基本详情
+		consigneeOrdersGroup.GET("/detail", ordersController.OrderDetailBasic)
 	}
 	senderOrderGroup := consigneeOrdersGroup.Group("/sender")
 	senderOrderGroup.Use(middleware.RequireRole())
@@ -93,14 +100,16 @@ func InitRouter(db *gorm.DB) *gin.Engine {
 	}
 	riderGroup := authGroup.Group("/rider")
 	//暂时注释掉权限中间件，以便测试骑手接单的业务逻辑
-	//riderGroup.Use(middleware.RequireRole())
+	riderGroup.Use(middleware.RequireRole())
 	{
 		//骑手待接单订单
-		riderGroup.GET("/waiting", ordersController.RiderOrderList)
+		riderGroup.GET("/list", ordersController.RiderOrderList)
 		//骑手接单
 		riderGroup.POST("/accept", ordersController.AcceptOrder)
 		//开始配送
 		riderGroup.POST("/start", ordersController.StartDelivery)
+		//取件
+		riderGroup.POST("/pickup", ordersController.PickupOrder)
 		//上传位置
 		riderGroup.POST("/location", ordersController.UploadLocation)
 		//完成订单

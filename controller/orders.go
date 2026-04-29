@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 	"webdemo/model"
 	"webdemo/service"
 	"webdemo/util"
@@ -33,12 +34,30 @@ func (controller *OrderController) CreateOrder(ctx *gin.Context) {
 	}
 	util.Success(ctx, nil)
 }
+func (controller *OrderController) OrderDetailBasic(ctx *gin.Context) {
+	orderNo := ctx.Query("order_no")
+	c := ctx.Request.Context()
+	order, err := controller.service.OrderDetailBasic(c, orderNo)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "获取订单基本详情失败")
+		return
+	}
+	util.Success(ctx, order)
+}
+
 func (controller *OrderController) SenderFinishedOrder(ctx *gin.Context) {
 	userId_ctx, _ := ctx.Get("user_id")
 	userId := userId_ctx.(uint)
 	var pageInfo model.Page
 	if err := ctx.ShouldBindQuery(&pageInfo); err != nil {
 		pageInfo.CurrentPage = 1
+		pageInfo.PerPage = 10
+	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
 		pageInfo.PerPage = 10
 	}
 	c := ctx.Request.Context()
@@ -58,6 +77,13 @@ func (controller *OrderController) SenderInTransitOrder(ctx *gin.Context) {
 		pageInfo.CurrentPage = 1
 		pageInfo.PerPage = 10
 	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
+		pageInfo.PerPage = 10
+	}
 	c := ctx.Request.Context()
 	orderList, total, err := controller.service.SenderInTransitOrder(c, userId, &pageInfo)
 	if err != nil {
@@ -72,6 +98,13 @@ func (controller *OrderController) SenderWaitingOrder(ctx *gin.Context) {
 	var pageInfo model.Page
 	if err := ctx.ShouldBindQuery(&pageInfo); err != nil {
 		pageInfo.CurrentPage = 1
+		pageInfo.PerPage = 10
+	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
 		pageInfo.PerPage = 10
 	}
 	c := ctx.Request.Context()
@@ -101,6 +134,13 @@ func (controller *OrderController) ReceiverFinishedOrder(ctx *gin.Context) {
 		pageInfo.CurrentPage = 1
 		pageInfo.PerPage = 10
 	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
+		pageInfo.PerPage = 10
+	}
 	c := ctx.Request.Context()
 	orderList, total, err := controller.service.ReceiverFinishedOrder(c, userId, &pageInfo)
 	if err != nil {
@@ -117,6 +157,13 @@ func (controller *OrderController) ReceiverInTransitOrder(ctx *gin.Context) {
 		pageInfo.CurrentPage = 1
 		pageInfo.PerPage = 10
 	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
+		pageInfo.PerPage = 10
+	}
 	c := ctx.Request.Context()
 	orderList, total, err := controller.service.ReceiverInTransitOrder(c, userId, &pageInfo)
 	if err != nil {
@@ -129,12 +176,25 @@ func (controller *OrderController) ReceiverInTransitOrder(ctx *gin.Context) {
 // ///////////////////
 func (controller *OrderController) RiderOrderList(ctx *gin.Context) {
 	var pageInfo model.Page
-	if err := ctx.ShouldBindQuery(&pageInfo); err != nil {
+	statusStr := ctx.Query("status")
+	status, err := strconv.Atoi(statusStr)
+	if err != nil {
+		util.Fail(ctx, http.StatusBadRequest, "状态参数错误")
+		return
+	}
+	if err = ctx.ShouldBindQuery(&pageInfo); err != nil {
 		pageInfo.CurrentPage = 1
 		pageInfo.PerPage = 10
 	}
+	// 确保分页参数有效
+	if pageInfo.CurrentPage < 1 {
+		pageInfo.CurrentPage = 1
+	}
+	if pageInfo.PerPage < 1 {
+		pageInfo.PerPage = 10
+	}
 	c := ctx.Request.Context()
-	orderList, total, err := controller.service.RiderOrderList(c, &pageInfo)
+	orderList, total, err := controller.service.RiderOrderList(c, status, &pageInfo)
 	if err != nil {
 		util.Fail(ctx, http.StatusBadRequest, "获取待接单订单失败")
 		return
@@ -161,6 +221,17 @@ func (controller *OrderController) StartDelivery(ctx *gin.Context) {
 	c := ctx.Request.Context()
 	if err := controller.service.StartDelivery(c, orderNo); err != nil {
 		util.Fail(ctx, http.StatusInternalServerError, "开始配送失败")
+		return
+	}
+	util.Success(ctx, nil)
+}
+
+// 取件
+func (controller *OrderController) PickupOrder(ctx *gin.Context) {
+	orderNo := ctx.Query("order_no")
+	c := ctx.Request.Context()
+	if err := controller.service.PickupOrder(c, orderNo); err != nil {
+		util.Fail(ctx, http.StatusInternalServerError, "取件失败")
 		return
 	}
 	util.Success(ctx, nil)

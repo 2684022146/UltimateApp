@@ -2,8 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"time"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"webdemo/model"
 	"webdemo/repository"
@@ -12,6 +18,8 @@ import (
 
 type OrderService interface {
 	CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error
+	OrderDetailBasic(ctx context.Context, orderNo string) (*model.OrderResponse, error)
+	//
 	SenderFinishedOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
 	SenderInTransitOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
 	SenderWaitingOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
@@ -21,10 +29,11 @@ type OrderService interface {
 	ReceiverFinishedOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
 	ReceiverInTransitOrder(ctx context.Context, userId uint, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
 	//
-	RiderOrderList(ctx context.Context, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
+	RiderOrderList(ctx context.Context, status int, pageInfo *model.Page) ([]*model.OrderResponse, int64, error)
 	// 骑手相关
 	AcceptOrder(ctx context.Context, orderNo string, deliveryUserID uint) error
 	StartDelivery(ctx context.Context, orderNo string) error
+	PickupOrder(ctx context.Context, orderNo string) error
 	UploadLocation(ctx context.Context, orderID uint, deliveryUserID uint, longitude, latitude float64) error
 	CompleteOrder(ctx context.Context, orderNo string) error
 }
@@ -37,8 +46,58 @@ func NewOrdersService(repo repository.OrdersRepository) OrderService {
 		repo: repo,
 	}
 }
+
 func (s *orderService) CreateOrder(ctx context.Context, req *model.CreateOrderRequest, userId uint) error {
+	log.Println("开始创建订单")
+	// 构建完整的收件地址
+	completeAddress := fmt.Sprintf("%s%s%s%s%s", req.ReceiverProvince, req.ReceiverCity, req.ReceiverDistrict, req.ReceiverStreet, req.ReceiverDetail)
+	log.Printf("完整地址: %s", completeAddress)
+	encodedAddress := url.QueryEscape(completeAddress)
+	url := fmt.Sprintf(apiUrl, encodedAddress)
+	log.Printf("API URL: %s", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("API请求失败: %v", err)
+		return fmt.Errorf("api失败:%w", err)
+	}
+	defer resp.Body.Close()
+	log.Printf("API响应状态码: %d", resp.StatusCode)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("读取API响应失败: %v", err)
+		return fmt.Errorf("读取地址信息失败:%w", err)
+	}
+	log.Printf("API响应内容: %s", string(body))
+
+	var geocodeResp model.GeocodeResponse
+	err = json.Unmarshal(body, &geocodeResp)
+	if err != nil {
+		log.Printf("解析API响应失败: %v", err)
+		return fmt.Errorf("解析地址信息失败:%w", err)
+	}
+	if geocodeResp.Status != "1" || len(geocodeResp.Geocodes) == 0 {
+		log.Printf("API获取geo失败, status: %s, geocodes长度: %d", geocodeResp.Status, len(geocodeResp.Geocodes))
+		return fmt.Errorf("api获取geo失败:%s", geocodeResp.Status)
+	}
+	coordinates := geocodeResp.Geocodes[0].Location
+	log.Printf("获取到的坐标: %s", coordinates)
+	parts := strings.Split(coordinates, ",")
+	longitudeStr := parts[0]
+	longitude, err := strconv.ParseFloat(longitudeStr, 64)
+	if err != nil {
+		log.Printf("解析经度失败: %v", err)
+		return fmt.Errorf("解析经度失败:%w", err)
+	}
+	latitudeStr := parts[1]
+	latitude, err := strconv.ParseFloat(latitudeStr, 64)
+	if err != nil {
+		log.Printf("解析纬度失败: %v", err)
+		return fmt.Errorf("解析纬度失败:%w", err)
+	}
+	log.Printf("解析后的坐标: 经度=%f, 纬度=%f", longitude, latitude)
+
 	orderId := util.GenerateOrderNo()
+	log.Printf("生成的订单号: %s", orderId)
 	orderDetail := &model.Order{
 		SenderUserID:      userId,
 		SenderAddressID:   req.SenderAddressID,
@@ -53,17 +112,28 @@ func (s *orderService) CreateOrder(ctx context.Context, req *model.CreateOrderRe
 		ReceiverDistrict:  req.ReceiverDistrict,
 		ReceiverStreet:    req.ReceiverStreet,
 		ReceiverDetail:    req.ReceiverDetail,
-		ReceiverLatitude:  req.ReceiverLatitude,
-		ReceiverLongitude: req.ReceiverLongitude,
-		CreateTime:        time.Now(),
-		UpdateTime:        time.Now(),
+		ReceiverLatitude:  latitude,
+		ReceiverLongitude: longitude,
 	}
 
+	log.Println("准备创建订单到数据库")
 	if err := s.repo.CreateOrder(ctx, orderDetail); err != nil {
+		log.Printf("数据库创建订单失败: %v", err)
 		return fmt.Errorf("创建新订单失败:%w", err)
 	}
+	log.Println("订单创建成功")
 	return nil
 }
+func (s *orderService) OrderDetailBasic(ctx context.Context, orderNo string) (*model.OrderResponse, error) {
+
+	orderDetailBasic, err := s.repo.OrderDetailBasic(ctx, orderNo)
+	if err != nil {
+		return nil, fmt.Errorf("获取订单基本详情失败:%w", err)
+	}
+	return s.convertToOrderResponse(orderDetailBasic), nil
+}
+
+//
 
 func (s *orderService) convertToOrderResponse(order *model.Order) *model.OrderResponse {
 	return &model.OrderResponse{
@@ -165,8 +235,8 @@ func (s *orderService) ReceiverInTransitOrder(ctx context.Context, userId uint, 
 }
 
 // ///////////////////////
-func (s *orderService) RiderOrderList(ctx context.Context, pageInfo *model.Page) ([]*model.OrderResponse, int64, error) {
-	orderList, total, err := s.repo.RiderOrderList(ctx, pageInfo)
+func (s *orderService) RiderOrderList(ctx context.Context, status int, pageInfo *model.Page) ([]*model.OrderResponse, int64, error) {
+	orderList, total, err := s.repo.RiderOrderList(ctx, status, pageInfo)
 	if err != nil {
 		return nil, 0, fmt.Errorf("获取待接单订单失败:%w", err)
 	}
@@ -189,6 +259,14 @@ func (s *orderService) AcceptOrder(ctx context.Context, orderNo string, delivery
 func (s *orderService) StartDelivery(ctx context.Context, orderNo string) error {
 	if err := s.repo.StartDelivery(ctx, orderNo); err != nil {
 		return fmt.Errorf("开始配送失败:%w", err)
+	}
+	return nil
+}
+
+// 取件
+func (s *orderService) PickupOrder(ctx context.Context, orderNo string) error {
+	if err := s.repo.PickupOrder(ctx, orderNo); err != nil {
+		return fmt.Errorf("取件失败:%w", err)
 	}
 	return nil
 }
